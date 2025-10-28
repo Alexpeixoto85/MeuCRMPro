@@ -15,8 +15,7 @@
         :root {
             --primary-color: #D4AF37;       /* Dourado Clássico */
             --secondary-color: #2C3E50;     /* Azul Ardósia / Grafite */
-            --accent-color: #34
-98DB;        /* Azul Vibrante para Ações */
+            --accent-color: #3498DB;        /* Azul Vibrante para Ações */
             --background-color: #F4F6F9;    /* Cinza Muito Claro */
             --surface-color: #FFFFFF;       /* Branco */
             --text-color: #34495E;          /* Cinza Escuro */
@@ -961,108 +960,21 @@
             }
         }
         /* ===== FIM: ESTILOS DE IMPRESSÃO ===== */
-/* ================================== */
-        /* ===== NOVOS ESTILOS - MENU MÓVEL ===== */
-        /* ================================== */
-        .mobile-menu-toggle {
-            display: none; /* Oculto no desktop por padrão */
-            background: none;
-            border: none;
-            color: var(--text-light-color);
-            font-size: 1.8rem;
-            cursor: pointer;
-            order: 3; /* Coloca o botão depois do logo */
-        }
-
-        .header-tools {
-            order: 4; /* Coloca as ferramentas por último */
-        }
-
-        nav {
-            order: 5; /* Coloca a navegação por último no desktop */
-        }
-        
-        /* Ponto de quebra: 1024px. Ajuste se necessário. */
-        @media (max-width: 1024px) {
-            header {
-                flex-wrap: wrap; /* Permite que o header quebre a linha */
-                justify-content: space-between;
-            }
-
-            .mobile-menu-toggle {
-                display: block; /* Mostra o botão hambúrguer */
-            }
-
-            .header-tools {
-                order: 3; /* Coloca as ferramentas ao lado do botão */
-                margin-left: auto; /* Empurra para a direita */
-            }
-
-            nav {
-                display: none; /* Esconde a barra de navegação */
-                order: 4; /* Coloca a navegação abaixo de tudo */
-                
-                /* Transforma em um menu vertical */
-                flex-basis: 100%; /* Ocupa 100% da largura */
-                flex-direction: column;
-                align-items: stretch; /* Botões ocupam 100% */
-                
-                /* Efeito de "dropdown" */
-                position: absolute;
-                top: 100%; /* Aparece abaixo do header */
-                left: 0;
-                right: 0;
-                background-color: var(--secondary-color);
-                box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-                z-index: 1100;
-                padding: 0.5rem;
-            }
-            
-            .nav-btn {
-                text-align: left;
-                padding: 1rem;
-            }
-
-            /* Classe que o JavaScript vai adicionar */
-            header.mobile-menu-open nav {
-                display: flex; /* Mostra o menu! */
-            }
-            
-            /* (OPCIONAL) Ajuste do Calendário para mobile */
-            .calendar-day {
-                min-height: 80px; /* Altura menor para celulares */
-                padding: 3px;
-            }
-            .event-pill {
-                font-size: 0.65rem; /* Fonte menor nas pílulas */
-                padding: 2px 3px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        }
-        /* ================================== */
-        /* === FIM DOS NOVOS ESTILOS MÓVEIS === */
-        /* ================================== */
 
     </style>
 </head>
 <body>
 
-   <header>
+    <header>
         <div class="logo-container">
+            <img id="header-logo" src="https://via.placeholder.com/150x50.png?text=Sua+Logo" alt="Logo">
+            <div class="broker-info">
+                <h1 id="header-broker-name">Nome do Corretor</h1>
+                <p id="header-broker-creci">CRECI: 00000</p>
             </div>
-
-        <button class="mobile-menu-toggle" aria-label="Abrir menu" aria-expanded="false">
-            <i class="fas fa-bars"></i>
-        </button>
+        </div>
         <nav>
-            </nav>
-        <div class="header-tools">
-            </div>
-    </header>
-        <nav>
-            <button class="nav-btn active" data-panel="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+            <button class="nav-btn active" data-panel="dashboard"><i class="fas fa-tachometer-alt"></i></button>
             <button class="nav-btn" data-panel="clients"><i class="fas fa-users"></i> Clientes</button>
             <button class="nav-btn" data-panel="properties"><i class="fas fa-building"></i> Imóveis</button>
             <button class="nav-btn" data-panel="agenda"><i class="fas fa-calendar-alt"></i> Agenda</button>
@@ -1072,6 +984,9 @@
             <button class="nav-btn" data-panel="financial"><i class="fas fa-chart-line"></i> Fin</button>
             <button class="nav-btn" data-panel="links"><i class="fas fa-link"></i> </button>
             <button class="nav-btn" data-panel="settings"><i class="fas fa-cog"></i> </button>
+            <a href="https://alexpeixoto85.github.io/relat-riopro/" target="_blank" class="nav-btn">
+    <i class="fas fa-file-alt"></i>
+</a>
         </nav>
         <div class="header-tools">
     <a href="https://alexpeixoto85.github.io/finan-aspropessoal/" target="_blank" class="calculator-link" title="Acessar Sistema Financeiro">
@@ -1402,28 +1317,6 @@ const emojis = [
 // Função auxiliar para criar uma pausa (delay)
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // =================================================================================
-// =================================================================================
-    // INÍCIO: LÓGICA DO MENU MÓVEL
-    // =================================================================================
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const header = document.querySelector('header');
-    const nav = document.querySelector('nav');
-
-    mobileMenuToggle.addEventListener('click', () => {
-        const isMenuOpen = header.classList.toggle('mobile-menu-open');
-        mobileMenuToggle.setAttribute('aria-expanded', isMenuOpen);
-    });
-
-    // Fecha o menu automaticamente ao clicar em um item da navegação
-    nav.addEventListener('click', (e) => {
-        if (e.target.closest('.nav-btn')) {
-            header.classList.remove('mobile-menu-open');
-            mobileMenuToggle.setAttribute('aria-expanded', false);
-        }
-    });
-    // =================================================================================
-    // FIM: LÓGICA DO MENU MÓVEL
-    // =================================================================================
 
         // ==========================================
         // BANCO DE DADOS (INDEXEDDB COM DEXIE.JS)
@@ -1623,6 +1516,31 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
             return resultado.charAt(0).toUpperCase() + resultado.slice(1);
         };
+// ==========================================
+// NOVA FUNÇÃO: VERIFICAR CLIENTES ESTAGNADOS
+// ==========================================
+const getStaleClientsForArchiving = () => {
+    const staleClients = [];
+    // Pega o ID da primeira etapa do funil (Ex: 'Lead') para não sugerir arquivamento de leads novos
+    const firstStageId = db.funnelStages[0]?.id; 
+
+    db.clients.forEach(client => {
+        // 1. Verifica se o cliente tem um histórico E se tem 3 ou mais contatos
+        if (client.contactHistory && client.contactHistory.length >= 3) {
+
+            // 2. Pega os dois últimos contatos registrados
+            const lastContact = client.contactHistory[client.contactHistory.length - 1];
+            const secondLastContact = client.contactHistory[client.contactHistory.length - 2];
+
+            // 3. Verifica se a etapa do funil é a MESMA entre os dois últimos contatos
+            //    E também impede que clientes na primeira etapa sejam arquivados
+            if (lastContact.stageId === secondLastContact.stageId && client.stageId !== firstStageId) {
+                staleClients.push(client);
+            }
+        }
+    });
+    return staleClients;
+};
 
 
         // ==========================================
@@ -1887,13 +1805,26 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
                     printContent(clientHtml, `Ficha do Cliente: ${client.name}`);
                  });
             } else if (action === 'contact') {
-                const client = db.clients.find(c => c.id == id);
-                if (client) {
-                    client.lastContact = new Date().toISOString().slice(0, 10);
-                    saveData();
-                    triggerClientTableRender();
-                }
-            }
+    const client = db.clients.find(c => c.id == id);
+    if (client) {
+        // Atualiza a data do último contato (para exibição na tabela)
+        client.lastContact = new Date().toISOString().slice(0, 10);
+
+        // INÍCIO DA NOVA LÓGICA: Adiciona ao histórico de contatos
+        if (!client.contactHistory) {
+            client.contactHistory = []; // Cria o histórico se não existir
+        }
+
+        client.contactHistory.push({
+            date: client.lastContact,
+            stageId: client.stageId // Salva qual era a etapa do funil NESTE contato
+        });
+        // FIM DA NOVA LÓGICA
+
+        saveData();
+        triggerClientTableRender();
+    }
+}
         });
         
         const renderFunnelFilters = () => {
@@ -3144,33 +3075,24 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
              document.getElementById('import-backup').click();
         });
         
-        // CÓDIGO NOVO (CORRIGIDO)
-document.getElementById('import-backup').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-
-    // 1. Tornamos a função 'onload' em 'async'
-    reader.onload = async (event) => { 
-        try {
-            const importedDb = JSON.parse(event.target.result);
-            if (confirm('Isso substituirá todos os dados atuais. Deseja continuar?')) {
-                db = importedDb;
-
-                // 2. Usamos 'await' para esperar o 'saveData' terminar
-                await saveData(); 
-
-                // 3. Só então recarregamos a página
-                alert('Backup importado com sucesso! O sistema será recarregado.');
-                location.reload(); 
-            }
-        } catch (err) {
-            console.error("Erro na importação de backup:", err);
-            alert('Erro ao ler o arquivo de backup. Verifique se o arquivo é válido.');
-        }
-    };
-    reader.readAsText(file);
-});
+        document.getElementById('import-backup').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedDb = JSON.parse(event.target.result);
+                    if (confirm('Isso substituirá todos os dados atuais. Deseja continuar?')) {
+                        db = importedDb;
+                        saveData();
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert('Erro ao ler o arquivo de backup. Verifique se o arquivo é válido.');
+                }
+            };
+            reader.readAsText(file);
+        });
         
         document.getElementById('download-template-btn').addEventListener('click', () => {
             const clientTemplate = [{
@@ -4391,6 +4313,7 @@ document.getElementById('import-backup').addEventListener('change', e => {
             };
 
             const financialAlerts = getFinancialAlerts();
+            const staleClients = getStaleClientsForArchiving();
             let financialAlertsHtml = '<li>Nenhum lançamento próximo.</li>';
             if (financialAlerts.length > 0) {
                 financialAlertsHtml = financialAlerts.map(alert => {
@@ -4407,24 +4330,40 @@ document.getElementById('import-backup').addEventListener('change', e => {
             }
 
             container.innerHTML = `
-                <div class="dashboard-card">
-                    <h3>Meta de Leads do Mês</h3>
-                    <p>${leadsThisMonth} / ${leadsGoal} Leads</p>
-                    <progress value="${leadsThisMonth}" max="${leadsGoal}" style="width: 100%; height: 20px;"></progress>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Lançamentos Vencendo e Vencidos</h3>
-                    <ul>${financialAlertsHtml}</ul>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Eventos de Hoje</h3>
-                    <ul>${renderEventList(todayEvents)}</ul>
-                </div>
-                 <div class="dashboard-card">
-                    <h3>Eventos de Amanhã</h3>
-                    <ul>${renderEventList(tomorrowEvents)}</ul>
-                </div>
-            `;
+    <div class="dashboard-card">
+        <h3>Meta de Leads do Mês</h3>
+        <p>${leadsThisMonth} / ${leadsGoal} Leads</p>
+        <progress value="${leadsThisMonth}" max="${leadsGoal}" style="width: 100%; height: 20px;"></progress>
+    </div>
+
+    <div class="dashboard-card">
+        <h3>Sugestão de Arquivamento</h3>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Clientes com 3+ contatos sem evolução no funil.</p>
+        <ul style="max-height: 150px; overflow-y: auto;">
+            ${staleClients.length > 0 ? 
+                staleClients.map(client => `
+                    <li style="cursor: pointer; color: var(--danger-color);" 
+                        onclick="switchPanel('clients'); document.getElementById('client-search').value='${client.name}'; triggerClientTableRender();"
+                        title="Clique para localizar ${client.name}">
+                        <i class="fas fa-archive"></i> ${client.name}
+                    </li>`).join('') : 
+                '<li>Nenhum cliente estagnado.</li>'
+            }
+        </ul>
+    </div>
+    <div class="dashboard-card">
+        <h3>Lançamentos Vencendo e Vencidos</h3>
+        <ul>${financialAlertsHtml}</ul>
+    </div>
+    <div class="dashboard-card">
+        <h3>Eventos de Hoje</h3>
+        <ul>${renderEventList(todayEvents)}</ul>
+    </div>
+        <div class="dashboard-card">
+        <h3>Eventos de Amanhã</h3>
+        <ul>${renderEventList(tomorrowEvents)}</ul>
+    </div>
+`;
             
             renderFunnelChart();
         };
