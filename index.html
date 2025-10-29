@@ -4086,6 +4086,7 @@ const getStaleClientsForArchiving = () => {
         // ==========================================
         modalSaveBtn.addEventListener('click', async () => {
             if (currentEntityType === 'client') {
+                // 1. Coletamos os dados do formulário
                 const clientData = {
                     id: currentEditingId || Date.now() + Math.random(), name: document.getElementById('client-name').value, phone: document.getElementById('client-phone').value,
                     email: document.getElementById('client-email').value, cpf: document.getElementById('client-cpf').value, birthdate: document.getElementById('client-birthdate').value,
@@ -4094,10 +4095,43 @@ const getStaleClientsForArchiving = () => {
                     leadSource: document.getElementById('client-lead-source').value, propertyId: document.getElementById('client-propertyId').value, notes: document.getElementById('client-notes').value,
                     lastContact: currentEditingId ? db.clients.find(c=>c.id==currentEditingId).lastContact : null
                 };
+
+                // 2. Padronizamos os dados de verificação (telefone e CPF), removendo letras e símbolos
+                const newPhone = (clientData.phone || '').replace(/\D/g, '');
+                const newCpf = (clientData.cpf || '').replace(/\D/g, '');
+
                 if(currentEditingId) {
+                    // 3. Se estiver EDITANDO, apenas salve (lógica original)
                     const index = db.clients.findIndex(c => c.id == currentEditingId);
                     if (index > -1) db.clients[index] = clientData;
-                } else { db.clients.push(clientData); }
+                } else {
+                    // 4. Se estiver ADICIONANDO UM NOVO CLIENTE, fazemos a verificação
+                    let existingClient = null;
+
+                    // Tenta encontrar por telefone (se o telefone foi preenchido)
+                    if (newPhone.length > 0) {
+                        existingClient = db.clients.find(c => (c.phone || '').replace(/\D/g, '') === newPhone);
+                    }
+
+                    // Se não achou por telefone, tenta por CPF (se o CPF foi preenchido)
+                    if (!existingClient && newCpf.length > 0) {
+                        existingClient = db.clients.find(c => (c.cpf || '').replace(/\D/g, '') === newCpf);
+                    }
+
+                    // 5. Verificamos o resultado
+                    if (existingClient) {
+                        // DUPLICADO! Mostra o alerta e PARA o salvamento
+                        openAlertModal('Cliente Duplicado', 
+                            `<p><i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> Um cliente já está cadastrado com este telefone ou CPF.</p>
+                             <p style="margin-top: 10px;"><strong>Nome:</strong> ${existingClient.name}<br>
+                             <strong>Telefone:</strong> ${existingClient.phone || 'N/A'}</p>`
+                        );
+                        return; // Impede que o restante do código de salvar seja executado
+                    } else {
+                        // NÃO DUPLICADO! Adiciona o cliente (lógica original)
+                        db.clients.push(clientData);
+                    }
+                }
             }
             if (currentEntityType === 'property') {
                 const selectedAmenities = Array.from(document.querySelectorAll('input[name="amenities"]:checked')).map(cb => cb.value);
