@@ -2565,10 +2565,30 @@ const getStaleClientsForArchiving = () => {
                     const client = db.clients.find(c => c.id == event.clientId);
                     const eventDateTime = new Date(`${event.date}T${event.time || '00:00:00'}`);
                     const isOverdue = !event.completed && eventDateTime < now;
+
+                    // --- INÍCIO DA MODIFICAÇÃO ---
+                    // 1. Criamos uma variável vazia para o botão
+                    let whatsappButtonHtml = '';
+
+                    // 2. Verificamos as condições:
+                    //    - O evento tem um cliente associado? (client)
+                    //    - Esse cliente tem um telefone? (client.phone)
+                    //    - O título do evento inclui "enviar mensagem"? (event.title.toLowerCase()...)
+                    if (client && client.phone && event.title.toLowerCase().includes('enviar mensagem')) {
+                        const cleanPhone = (client.phone || '').replace(/\D/g, ''); // Limpa o número
+                        
+                        // 3. Se tudo for verdade, criamos o link do WhatsApp
+                        whatsappButtonHtml = `
+                            <a href="https://wa.me/${cleanPhone}" target="_blank" title="Enviar WhatsApp para ${client.name}" 
+                               style="font-size: 1.2rem; color: #25D366; margin-left: 10px; text-decoration: none;">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>`;
+                    }
+                    // --- FIM DA MODIFICAÇÃO ---
                     
                     content += `
                         <div class="event-item ${event.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}" data-id="${event.id}">
-                            <h4>${event.title} - ${event.time || 'horário não definido'}</h4>
+                            <h4>${event.title} - ${event.time || 'horário não definido'} ${whatsappButtonHtml}</h4>
                             <p>${event.description}</p>
                             ${client ? `<p><strong>Cliente:</strong> ${client.name}</p>` : ''}
                             <div class="action-buttons" style="margin-top: 10px;">
