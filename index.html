@@ -2680,82 +2680,84 @@ const getStaleClientsForArchiving = () => {
         };
 
         const calculateFinancing = (client, property) => {
-        // 1. Validação de dados de entrada
-        // USA VALOR DE AVALIAÇÃO (ou tabela se avaliação for 0 ou não existir)
-        const propertyPrice = (property.evalPrice && property.evalPrice > 0) ? property.evalPrice : property.listPrice;
+            // 1. Validação de dados de entrada
+            // USA VALOR DE AVALIAÇÃO (ou tabela se avaliação for 0 ou não existir)
+            const propertyPrice = (property.evalPrice && property.evalPrice > 0) ? property.evalPrice : property.listPrice;
 
-        if (!client || !property || !client.income || !client.birthdate || !propertyPrice) {
-            return { error: 'Dados insuficientes. Verifique se o cliente possui renda, data de nascimento e um imóvel de interesse com valor de avaliação (ou tabela) cadastrado.' };
-        }
+            if (!client || !property || !client.income || !client.birthdate || !propertyPrice) {
+                return { error: 'Dados insuficientes. Verifique se o cliente possui renda, data de nascimento e um imóvel de interesse com valor de avaliação (ou tabela) cadastrado.' };
+            }
 
-        const clientAgeInMonths = getAgeInMonths(client.birthdate);
-        if (clientAgeInMonths === null) {
-            return { error: 'Data de nascimento do cliente é inválida.' };
-        }
+            const clientAgeInMonths = getAgeInMonths(client.birthdate);
+            if (clientAgeInMonths === null) {
+                return { error: 'Data de nascimento do cliente é inválida.' };
+            }
 
-        // 2. Define as taxas de juros com base na carteira assinada
-        // client.hasFormalWork virá do formulário (true/false) que criamos no Passo 2 e 3
-        let INTEREST_RATE_YEARLY;
-        if (client.hasFormalWork) {
-            // Com 3+ anos de carteira: 7.9348%
-            INTEREST_RATE_YEARLY = 0.079348; 
-        } else {
-            // Sem 3+ anos de carteira: 8.4723%
-            INTEREST_RATE_YEARLY = 0.084723;
-        }
+            // 2. Define as taxas de juros (COM A NOVA LÓGICA)
+            let INTEREST_RATE_YEARLY;
+            let rateReason = ''; // (NOVO) Variável para explicar a taxa no relatório
 
-        // 3. Constantes do financiamento (como antes)
-        const MAX_AGE_MONTHS = 966; // 80 anos e 6 meses
-        const MAX_TERM_MONTHS = 420; // 35 anos
-        const MAX_LOAN_TO_VALUE = 0.80; // 80%
-        const MAX_DEBT_TO_INCOME = 0.30; // 30%
+            if (client.income && client.income <= 4700) {
+                // REGRA 1: Renda até R$ 4.700 (Sua nova regra)
+                INTEREST_RATE_YEARLY = 0.066972; // Taxa Efetiva de 6.6972%
+                rateReason = 'Renda <= R$ 4.700 (Taxa 6,5% Nominal)';
+            } else {
+                // REGRA 2: Renda acima de R$ 4.700 (lógica antiga)
+                if (client.hasFormalWork) {
+                    // Com 3+ anos de carteira: 7.9348%
+                    INTEREST_RATE_YEARLY = 0.079348;
+                    rateReason = 'Renda > R$ 4.700 (Com 3+ anos CA)';
+                } else {
+                    // Sem 3+ anos de carteira: 8.4723%
+                    INTEREST_RATE_YEARLY = 0.084723;
+                    rateReason = 'Renda > R$ 4.700 (Sem 3+ anos CA)';
+                }
+            }
+            
+            // 3. Constantes do financiamento (como antes)
+            const MAX_AGE_MONTHS = 966; // 80 anos e 6 meses
+            const MAX_TERM_MONTHS = 420; // 35 anos
+            const MAX_LOAN_TO_VALUE = 0.80; // 80%
+            const MAX_DEBT_TO_INCOME = 0.30; // 30%
 
-        // 4. Cálculo do prazo (como antes)
-        const maxTermByAge = MAX_AGE_MONTHS - clientAgeInMonths;
-        if (maxTermByAge <= 0) {
-            return { error: 'Cliente acima da idade máxima para financiamento.' };
-        }
-        const finalTerm = Math.min(MAX_TERM_MONTHS, maxTermByAge);
+            // 4. Cálculo do prazo (como antes)
+            const maxTermByAge = MAX_AGE_MONTHS - clientAgeInMonths;
+            if (maxTermByAge <= 0) {
+                return { error: 'Cliente acima da idade máxima para financiamento.' };
+            }
+            const finalTerm = Math.min(MAX_TERM_MONTHS, maxTermByAge);
 
-        // 5. Cálculo da taxa MENSAL (baseada na taxa ANUAL que definimos)
-        const monthlyInterestRate = (1 + INTEREST_RATE_YEARLY)**(1/12) - 1; 
+            // 5. Cálculo da taxa MENSAL (baseada na taxa ANUAL que definimos)
+            const monthlyInterestRate = (1 + INTEREST_RATE_YEARLY)**(1/12) - 1; 
 
-        // 6. Cálculos de financiamento
-        // O valor máximo do empréstimo é 80% do VALOR DE AVALIAÇÃO (propertyPrice)
-        const maxLoanFromBank = propertyPrice * MAX_LOAN_TO_VALUE;
-        // A parcela máxima é 30% da RENDA DO CLIENTE
-        const maxAffordablePayment = client.income * MAX_DEBT_TO_INCOME;
+            // 6. Cálculos de financiamento
+            const maxLoanFromBank = propertyPrice * MAX_LOAN_TO_VALUE;
+            const maxAffordablePayment = client.income * MAX_DEBT_TO_INCOME;
+            const requiredPaymentForMaxLoan = (maxLoanFromBank * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
 
-        // Parcela necessária para financiar o valor MÁXIMO (80% da avaliação)
-        const requiredPaymentForMaxLoan = (maxLoanFromBank * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
+            const isCompatible = requiredPaymentForMaxLoan <= maxAffordablePayment;
+            let approvedLoanAmount, requiredDownPayment;
 
-        const isCompatible = requiredPaymentForMaxLoan <= maxAffordablePayment;
-        let approvedLoanAmount, requiredDownPayment;
+            if (isCompatible) {
+                approvedLoanAmount = maxLoanFromBank;
+                requiredDownPayment = property.listPrice - approvedLoanAmount;
+            } else {
+                approvedLoanAmount = (maxAffordablePayment / monthlyInterestRate) * (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
+                requiredDownPayment = property.listPrice - approvedLoanAmount;
+            }
 
-        if (isCompatible) {
-            // Se a renda é compatível, o banco libera os 80% da avaliação
-            approvedLoanAmount = maxLoanFromBank;
-            // A ENTRADA é a diferença entre o VALOR DE TABELA (venda) e o que o banco aprovou
-            requiredDownPayment = property.listPrice - approvedLoanAmount;
-        } else {
-            // Se a renda não é compatível, calcula o MÁXIMO que o cliente pode financiar com base na PARCELA MÁXIMA
-            approvedLoanAmount = (maxAffordablePayment / monthlyInterestRate) * (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
-            // A ENTRADA continua sendo a diferença do VALOR DE TABELA
-            requiredDownPayment = property.listPrice - approvedLoanAmount;
-        }
-
-        // 7. Retorna os resultados
-        return {
-            isCompatible, clientIncome: client.income, 
-            propertyValue: propertyPrice, // Valor de Avaliação usado no cálculo
-            listPrice: property.listPrice, // Valor de Tabela para cálculo da entrada
-            maxAffordablePayment, requiredPaymentForMaxLoan, approvedLoanAmount, requiredDownPayment,
-            finalTerm: Math.floor(finalTerm), 
-            // Entrada padrão (caso o banco liberasse 80% da avaliação)
-            standardDownPayment: property.listPrice - (propertyPrice * MAX_LOAN_TO_VALUE),
-            rateUsed: INTEREST_RATE_YEARLY // Informa a taxa que foi usada
+            // 7. Retorna os resultados
+            return {
+                isCompatible, clientIncome: client.income, 
+                propertyValue: propertyPrice, // Valor de Avaliação usado no cálculo
+                listPrice: property.listPrice, // Valor de Tabela para cálculo da entrada
+                maxAffordablePayment, requiredPaymentForMaxLoan, approvedLoanAmount, requiredDownPayment,
+                finalTerm: Math.floor(finalTerm), 
+                standardDownPayment: property.listPrice - (propertyPrice * MAX_LOAN_TO_VALUE),
+                rateUsed: INTEREST_RATE_YEARLY, // Informa a taxa que foi usada
+                rateReason: rateReason // (NOVO) Informa o motivo da taxa
+            };
         };
-    };
 
         const getFinancingAnalysisHtml = (analysis, clientName, propertyName) => {
          if (analysis.error) {
