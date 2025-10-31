@@ -443,24 +443,27 @@
             box-sizing: border-box;
         }
         .portfolio-v2-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding-bottom: 8mm;
-            border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center; /* Centraliza verticalmente */
+    padding: 4mm 8mm; /* Adiciona um espaço interno */
+    border: 2px solid var(--secondary-color);
+    background-color: transparent; /* ADICIONA A FAIXA AZUL */
+}
+        .portfolio-v2-broker-info { 
+            text-align: center; /* Centraliza o texto */
+            flex-grow: 1; /* Faz o bloco ocupar o espaço central */
         }
-        .portfolio-v2-broker-info { text-align: left; }
         .portfolio-v2-broker-info h1 {
-            font-size: 14pt;
-            color: var(--secondary-color);
-            margin: 0;
-            font-weight: 700;
-        }
+    font-size: 22pt;
+    color: var(--primary-color); /* Cor Dourada */
+    margin: 0;
+    font-weight: 700;
+}
         .portfolio-v2-broker-info p {
-            font-size: 9pt;
-            margin: 2px 0 0 0;
-            color: var(--text-color);
-        }
+    font-size: 9pt;
+    margin: 2px 0 0 0;
+    color: var(--secondary-color); /* Cor Branca */
+}
         .portfolio-v2-logo {
             max-height: 15mm;
             max-width: 40mm;
@@ -960,6 +963,40 @@
             }
         }
         /* ===== FIM: ESTILOS DE IMPRESSÃO ===== */
+/* ===== INÍCIO: ESTILOS DO PAINEL FINANCEIRO (ProspectoPro4) ===== */
+        .financial-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            padding-top: 15px;
+            margin-bottom: 2rem;
+        }
+        .financial-metric {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--surface-color); /* Adaptado para o MeuCRM6 */
+            border-radius: 8px;
+            border-bottom: 4px solid var(--primary-color); /* Adaptado para o MeuCRM6 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .financial-metric h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        .financial-metric .financial-amount {
+            font-size: 2rem; /* Aumentado para 2rem */
+            font-weight: 700;
+            font-family: 'Roboto', 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+        /* Cores adaptadas para as variáveis do MeuCRM6 */
+        .financial-metric .financial-amount.success { color: var(--success-color); }
+        .financial-metric .financial-amount.danger { color: var(--danger-color); }
+        .financial-metric .financial-amount.info { color: var(--secondary-color); }
+        /* ===== FIM: ESTILOS DO PAINEL FINANCEIRO (ProspectoPro4) ===== */
 
     </style>
 </head>
@@ -1148,7 +1185,30 @@
                     <button id="add-expense-btn" class="btn-danger"><i class="fas fa-minus"></i> Nova Despesa</button>
                 </div>
             </div>
-            <div id="financial-bi-content" class="financial-grid-container"></div>
+            <div class="financial-dashboard" id="financial-bi-content">
+
+    <div class="financial-metric">
+        <h4>Receita Realizada (Recebida)</h4>
+        <p id="bi-realized-revenue" class="financial-amount success">R$ 0,00</p>
+    </div>
+
+    <div class="financial-metric">
+        <h4>Despesa Realizada (Paga)</h4>
+        <p id="bi-realized-expense" class="financial-amount danger">R$ 0,00</p>
+    </div>
+
+    <div class="financial-metric">
+        <h4>Saldo Atual</h4>
+        <p id="bi-balance" class="financial-amount info">R$ 0,00</p>
+    </div>
+
+    <div class="financial-metric" id="card-pending-payments" style="cursor: pointer;" title="Ver todos os lançamentos pendentes">
+    <h4>A Vencer (Próx. 30 dias)</h4>
+    <p id="bi-future-revenue" class="financial-amount success" style="font-size: 1.2rem; margin-bottom: 0;">R$ 0,00</p>
+    <p id="bi-future-expense" class="financial-amount danger" style="font-size: 1.2rem; margin-top: 5px;">R$ 0,00</p>
+</div>
+
+</div>
             <h3>Lançamentos Financeiros</h3>
             <div class="table-container">
                 <table id="financial-records-table">
@@ -1691,6 +1751,10 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="client-cpf">CPF</label><input type="text" id="client-cpf" value="${client.cpf || ''}"></div>
                     <div class="form-group"><label for="client-birthdate">Data de Nascimento</label><input type="date" id="client-birthdate" value="${client.birthdate || ''}"></div>
                     <div class="form-group"><label for="client-income">Renda (R$)</label><input type="number" id="client-income" value="${client.income || ''}"></div>
+                <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                    <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
+                    <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
+                </div>
                     <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
                     <div class="form-group"><label for="client-commission">Comissão Personalizada (%)</label><input type="number" id="client-commission" placeholder="Padrão: ${db.settings.defaultCommission}%" value="${client.commission || ''}"></div>
                     <div class="form-group"><label for="client-stageId">Etapa do Funil</label><select id="client-stageId">${funnelOptions}</select></div>
@@ -1900,9 +1964,10 @@ const getStaleClientsForArchiving = () => {
             tempPropertyImages = prop.images ? [...prop.images] : [];
             tempMainImageIndex = (prop.mainImageIndex !== undefined && prop.mainImageIndex < tempPropertyImages.length) ? prop.mainImageIndex : -1;
 
-            const incomeText = (prop.listPrice && prop.listPrice > 0) 
-                ? `(Renda Mínima Estimada: ${formatCurrency(calculateMinimumIncomeForProperty(prop.listPrice))})`
-                : '';
+            const priceForIncomeCalc = (prop.evalPrice && prop.evalPrice > 0) ? prop.evalPrice : prop.listPrice;
+        const incomeText = (priceForIncomeCalc > 0) 
+            ? `(Renda Mínima Estimada: ${formatCurrency(calculateMinimumIncomeForProperty(priceForIncomeCalc))})`
+            : '';
 
             const savedAmenities = prop.amenities || [];
             const amenitiesCheckboxes = db.amenities.map(amenity => `
@@ -1918,11 +1983,19 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="prop-location">Localização</label><input type="text" id="prop-location" value="${prop.location || ''}"></div>
                     <div class="form-group"><label for="prop-list-price">Valor de Tabela (R$) ${incomeText}</label><input type="number" id="prop-list-price" value="${prop.listPrice || ''}"></div>
                     <div class="form-group"><label for="prop-eval-price">Valor de Avaliação (R$)</label><input type="number" id="prop-eval-price" value="${prop.evalPrice || ''}"></div>
+<div class="form-group"><label for="prop-area-privativa">Área Privativa (m²)</label><input type="number" id="prop-area-privativa" value="${prop.areaPrivativa || ''}" placeholder="Ex: 75.5"></div>
+                    <div class="form-group"><label for="prop-sinal">Sinal (R$)</label><input type="number" id="prop-sinal" value="${prop.sinal || ''}" placeholder="Ex: 50000"></div>
+                    <div class="form-group"><label for="prop-parcelas-entrada">Parcelas da Entrada</label><input type="text" id="prop-parcelas-entrada" value="${prop.parcelasEntrada || ''}" placeholder="Ex: 36x de R$ 2.000"></div>
+                    <div class="form-group"><label for="prop-parcelas-semestrais">Parcelas Semestrais</label><input type="text" id="prop-parcelas-semestrais" value="${prop.parcelasSemestrais || ''}" placeholder="Ex: 6x de R$ 10.000"></div>
                     <div class="form-group"><label for="prop-delivery-date">Data de Entrega</label><input type="date" id="prop-delivery-date" value="${prop.deliveryDate || ''}"></div>
                     <div class="form-group"><label for="prop-link">Link (Tour Virtual, Site)</label><input type="url" id="prop-link" value="${prop.link || ''}"></div>
                     <div class="form-group full-width"><label for="prop-video-link">Link do Vídeo (YouTube, Vimeo)</label><input type="url" id="prop-video-link" value="${prop.videoLink || ''}"></div>
                     <div class="form-group full-width"><label for="prop-description">Descrição Textual</label><textarea id="prop-description" placeholder="Use este campo para um texto de marketing, detalhes sobre a unidade, etc.">${prop.description || ''}</textarea></div>
                     
+                    <div class="form-group"><label for="prop-condo-fee">Valor Estimado do Condomínio (R$)</label><input type="number" id="prop-condo-fee" value="${prop.condoFee || ''}" placeholder="Ex: 500"></div>
+                    <div class="form-group"><label for="prop-dev-financing">Detalhes Financiamento Construtora</label><input type="text" id="prop-dev-financing" value="${prop.devFinancing || ''}" placeholder="Ex: Até 80% da entrada em 36x"></div>
+                    <div class="form-group full-width"><label for="prop-other-info">Outras Informações (Visível na Ficha)</label><textarea id="prop-other-info" rows="3" placeholder="Ex: Evolução da obra permite intercaladas...">${prop.otherInfo || ''}</textarea></div>
+
                     <div class="form-group full-width">
                         <label>Diferenciais e Comodidades</label>
                         <div class="amenities-container">
@@ -2599,7 +2672,7 @@ const getStaleClientsForArchiving = () => {
         const calculateMinimumIncomeForProperty = (propertyPrice) => {
             if (!propertyPrice || propertyPrice <= 0) return 0;
             const P = propertyPrice * 0.80; 
-            const r = (1 + 0.05)**(1/12) - 1; 
+            const r = (1 + 0.079348)**(1/12) - 1; 
             const n = 420; 
             const pmt = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
             const requiredIncome = pmt / 0.30;
@@ -2607,75 +2680,110 @@ const getStaleClientsForArchiving = () => {
         };
 
         const calculateFinancing = (client, property) => {
-            if (!client || !property || !client.income || !client.birthdate || !property.listPrice) {
-                return { error: 'Dados insuficientes. Verifique se o cliente possui renda, data de nascimento e um imóvel de interesse com valor cadastrado.' };
-            }
+        // 1. Validação de dados de entrada
+        // USA VALOR DE AVALIAÇÃO (ou tabela se avaliação for 0 ou não existir)
+        const propertyPrice = (property.evalPrice && property.evalPrice > 0) ? property.evalPrice : property.listPrice;
 
-            const clientAgeInMonths = getAgeInMonths(client.birthdate);
-            if (clientAgeInMonths === null) {
-                return { error: 'Data de nascimento do cliente é inválida.' };
-            }
-            
-            const MAX_AGE_MONTHS = 966; // 80 anos e 6 meses
-            const MAX_TERM_MONTHS = 420; // 35 anos
-            const INTEREST_RATE_YEARLY = 0.05;
-            const MAX_LOAN_TO_VALUE = 0.80; // 80%
-            const MAX_DEBT_TO_INCOME = 0.30; // 30%
+        if (!client || !property || !client.income || !client.birthdate || !propertyPrice) {
+            return { error: 'Dados insuficientes. Verifique se o cliente possui renda, data de nascimento e um imóvel de interesse com valor de avaliação (ou tabela) cadastrado.' };
+        }
 
-            const maxTermByAge = MAX_AGE_MONTHS - clientAgeInMonths;
-            if (maxTermByAge <= 0) {
-                return { error: 'Cliente acima da idade máxima para financiamento.' };
-            }
+        const clientAgeInMonths = getAgeInMonths(client.birthdate);
+        if (clientAgeInMonths === null) {
+            return { error: 'Data de nascimento do cliente é inválida.' };
+        }
 
-            const finalTerm = Math.min(MAX_TERM_MONTHS, maxTermByAge);
-            const monthlyInterestRate = (1 + INTEREST_RATE_YEARLY)**(1/12) - 1; 
-            
-            const maxLoanFromBank = property.listPrice * MAX_LOAN_TO_VALUE;
-            const maxAffordablePayment = client.income * MAX_DEBT_TO_INCOME;
+        // 2. Define as taxas de juros com base na carteira assinada
+        // client.hasFormalWork virá do formulário (true/false) que criamos no Passo 2 e 3
+        let INTEREST_RATE_YEARLY;
+        if (client.hasFormalWork) {
+            // Com 3+ anos de carteira: 7.9348%
+            INTEREST_RATE_YEARLY = 0.079348; 
+        } else {
+            // Sem 3+ anos de carteira: 8.4723%
+            INTEREST_RATE_YEARLY = 0.084723;
+        }
 
-            const requiredPaymentForMaxLoan = (maxLoanFromBank * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
-            const isCompatible = requiredPaymentForMaxLoan <= maxAffordablePayment;
-            let approvedLoanAmount, requiredDownPayment;
+        // 3. Constantes do financiamento (como antes)
+        const MAX_AGE_MONTHS = 966; // 80 anos e 6 meses
+        const MAX_TERM_MONTHS = 420; // 35 anos
+        const MAX_LOAN_TO_VALUE = 0.80; // 80%
+        const MAX_DEBT_TO_INCOME = 0.30; // 30%
 
-            if (isCompatible) {
-                approvedLoanAmount = maxLoanFromBank;
-                requiredDownPayment = property.listPrice - approvedLoanAmount;
-            } else {
-                approvedLoanAmount = (maxAffordablePayment / monthlyInterestRate) * (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
-                requiredDownPayment = property.listPrice - approvedLoanAmount;
-            }
+        // 4. Cálculo do prazo (como antes)
+        const maxTermByAge = MAX_AGE_MONTHS - clientAgeInMonths;
+        if (maxTermByAge <= 0) {
+            return { error: 'Cliente acima da idade máxima para financiamento.' };
+        }
+        const finalTerm = Math.min(MAX_TERM_MONTHS, maxTermByAge);
 
-            return {
-                isCompatible, clientIncome: client.income, propertyValue: property.listPrice,
-                maxAffordablePayment, requiredPaymentForMaxLoan, approvedLoanAmount, requiredDownPayment,
-                finalTerm: Math.floor(finalTerm), standardDownPayment: property.listPrice * (1 - MAX_LOAN_TO_VALUE)
-            };
+        // 5. Cálculo da taxa MENSAL (baseada na taxa ANUAL que definimos)
+        const monthlyInterestRate = (1 + INTEREST_RATE_YEARLY)**(1/12) - 1; 
+
+        // 6. Cálculos de financiamento
+        // O valor máximo do empréstimo é 80% do VALOR DE AVALIAÇÃO (propertyPrice)
+        const maxLoanFromBank = propertyPrice * MAX_LOAN_TO_VALUE;
+        // A parcela máxima é 30% da RENDA DO CLIENTE
+        const maxAffordablePayment = client.income * MAX_DEBT_TO_INCOME;
+
+        // Parcela necessária para financiar o valor MÁXIMO (80% da avaliação)
+        const requiredPaymentForMaxLoan = (maxLoanFromBank * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
+
+        const isCompatible = requiredPaymentForMaxLoan <= maxAffordablePayment;
+        let approvedLoanAmount, requiredDownPayment;
+
+        if (isCompatible) {
+            // Se a renda é compatível, o banco libera os 80% da avaliação
+            approvedLoanAmount = maxLoanFromBank;
+            // A ENTRADA é a diferença entre o VALOR DE TABELA (venda) e o que o banco aprovou
+            requiredDownPayment = property.listPrice - approvedLoanAmount;
+        } else {
+            // Se a renda não é compatível, calcula o MÁXIMO que o cliente pode financiar com base na PARCELA MÁXIMA
+            approvedLoanAmount = (maxAffordablePayment / monthlyInterestRate) * (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
+            // A ENTRADA continua sendo a diferença do VALOR DE TABELA
+            requiredDownPayment = property.listPrice - approvedLoanAmount;
+        }
+
+        // 7. Retorna os resultados
+        return {
+            isCompatible, clientIncome: client.income, 
+            propertyValue: propertyPrice, // Valor de Avaliação usado no cálculo
+            listPrice: property.listPrice, // Valor de Tabela para cálculo da entrada
+            maxAffordablePayment, requiredPaymentForMaxLoan, approvedLoanAmount, requiredDownPayment,
+            finalTerm: Math.floor(finalTerm), 
+            // Entrada padrão (caso o banco liberasse 80% da avaliação)
+            standardDownPayment: property.listPrice - (propertyPrice * MAX_LOAN_TO_VALUE),
+            rateUsed: INTEREST_RATE_YEARLY // Informa a taxa que foi usada
         };
+    };
 
         const getFinancingAnalysisHtml = (analysis, clientName, propertyName) => {
-             if (analysis.error) {
-                return `<div class="analysis-result"><p class="highlight-danger">${analysis.error}</p></div>`;
-            }
-            
-            const resultClass = analysis.isCompatible ? 'highlight-success' : 'highlight-danger';
-            const resultText = analysis.isCompatible ? 'RENDA COMPATÍVEL' : 'RENDA INSUFICIENTE PARA FINANCIAMENTO DE 80%';
+         if (analysis.error) {
+            return `<div class="analysis-result"><p class="highlight-danger">${analysis.error}</p></div>`;
+        }
 
-            return `
-                <div class="analysis-result">
-                    <h4>Análise para <strong>${clientName}</strong> | Imóvel: <strong>${propertyName}</strong></h4><hr>
-                    <p><strong>Valor do Imóvel:</strong> ${formatCurrency(analysis.propertyValue)}</p>
-                    <p><strong>Renda do Cliente:</strong> ${formatCurrency(analysis.clientIncome)}</p>
-                    <p><strong>Parcela Máxima Suportada (30%):</strong> ${formatCurrency(analysis.maxAffordablePayment)}</p>
-                    <p><strong>Prazo Máximo de Financiamento:</strong> ${analysis.finalTerm} meses (${Math.floor(analysis.finalTerm / 12)} anos)</p><hr>
-                    <h4>Resultado da Simulação</h4>
-                    <p><strong>Parcela Estimada para 80% do Imóvel:</strong> ${formatCurrency(analysis.requiredPaymentForMaxLoan)}</p>
-                    <p><strong>Resultado:</strong> <span class="${resultClass}">${resultText}</span></p><br>
-                    <p><strong>Valor Máximo de Financiamento Aprovado:</strong> ${formatCurrency(analysis.approvedLoanAmount)}</p>
-                    <p><strong>ENTRADA ESTIMADA NECESSÁRIA:</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
-                    ${!analysis.isCompatible ? `<p><small>(A entrada padrão de 20% seria de ${formatCurrency(analysis.standardDownPayment)})</small></p>` : ''}
-                </div>
-            `;
-        };
+        const resultClass = analysis.isCompatible ? 'highlight-success' : 'highlight-danger';
+        const resultText = analysis.isCompatible ? 'RENDA COMPATÍVEL' : 'RENDA INSUFICIENTE PARA FINANCIAMENTO DE 80%';
+        const rateUsedPercent = (analysis.rateUsed * 100).toFixed(4); // Mostra a taxa exata
+
+        return `
+            <div class="analysis-result">
+                <h4>Análise para <strong>${clientName}</strong> | Imóvel: <strong>${propertyName}</strong></h4><hr>
+                <p><strong>Valor de Tabela (Venda):</strong> ${formatCurrency(analysis.listPrice)}</p>
+                <p><strong>Valor de Avaliação (Base do Cálculo):</strong> ${formatCurrency(analysis.propertyValue)}</p>
+                <p><strong>Renda do Cliente:</strong> ${formatCurrency(analysis.clientIncome)}</p>
+                <p><strong>Taxa de Juros Efetiva (Anual):</strong> ${rateUsedPercent}% ${analysis.rateUsed > 0.08 ? '(Sem 3+ anos CA)' : '(Com 3+ anos CA)'}</p>
+                <p><strong>Parcela Máxima Suportada (30%):</strong> ${formatCurrency(analysis.maxAffordablePayment)}</p>
+                <p><strong>Prazo Máximo de Financiamento:</strong> ${analysis.finalTerm} meses (${Math.floor(analysis.finalTerm / 12)} anos)</p><hr>
+                <h4>Resultado da Simulação</h4>
+                <p><strong>Parcela Estimada (para 80% da Avaliação):</strong> ${formatCurrency(analysis.requiredPaymentForMaxLoan)}</p>
+                <p><strong>Resultado:</strong> <span class="${resultClass}">${resultText}</span></p><br>
+                <p><strong>Valor Máximo de Financiamento Aprovado:</strong> ${formatCurrency(analysis.approvedLoanAmount)}</p>
+                <p><strong>ENTRADA (Diferença do Valor de Tabela):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
+                ${!analysis.isCompatible ? `<p><small>(A entrada padrão com base na avaliação seria de ${formatCurrency(analysis.standardDownPayment)})</small></p>` : ''}
+            </div>
+        `;
+    };
         
         const handleFinancingAnalysis = (clientId) => {
             const client = db.clients.find(c => c.id == clientId);
@@ -2687,14 +2795,56 @@ const getStaleClientsForArchiving = () => {
             }
             
             const analysis = calculateFinancing(client, property);
-            const modalHtml = getFinancingAnalysisHtml(analysis, client.name, property.name);
+            
+            // 1. Geramos o HTML da análise (como antes)
+            const analysisHtml = getFinancingAnalysisHtml(analysis, client.name, property.name);
+            
+            // 2. Criamos o HTML completo do modal, incluindo o novo botão no rodapé
+            const modalHtml = `
+                <div id="analysis-content-wrapper">
+                    ${analysisHtml}
+                </div>
+                <div class="modal-footer" style="display:flex; justify-content: flex-end; margin-top: 1rem;">
+                    <button id="download-analysis-pdf-btn" class="btn-primary"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
+                </div>
+            `;
+            
+            // 3. Abrimos o modal
             openModal('Análise de Financiamento', modalHtml, 'analysis', null, false);
+
+            // 4. Adicionamos o "ouvinte" para o novo botão que acabamos de criar
+            document.getElementById('download-analysis-pdf-btn').addEventListener('click', () => {
+                // Pegamos o cabeçalho padrão dos documentos
+                const headerPdfHtml = getDocumentHeaderHtml();
+                
+                // Pegamos o conteúdo da análise que está no modal
+                const analysisContent = document.getElementById('analysis-content-wrapper').innerHTML;
+                
+                // Montamos o documento completo para o PDF
+                const pdfDocHtml = `
+                    <div class="pdf-document-container">
+                        ${headerPdfHtml}
+                        <div class="pdf-content">
+                            <h1>Análise de Financiamento</h1>
+                            <p><strong>Cliente:</strong> ${client.name}</p>
+                            <p><strong>Imóvel:</strong> ${property.name}</p>
+                            ${analysisContent}
+                        </div>
+                    </div>
+                `;
+                
+                // Criamos um nome de arquivo
+                const fileName = `Analise_Financiamento_${client.name.replaceAll(' ', '_')}.pdf`;
+                
+                // Chamamos sua função de gerar PDF já existente
+                generatePDF(pdfDocHtml, fileName);
+            });
         };
         
         // ==========================================
         // GESTÃO FINANCEIRA & BI (COM NOVAS REGRAS)
         // ==========================================
-        const getFinancialRecordFormHtml = (record = {}, type = 'income', paymentDate = null) => {
+        const getFinancialRecordFormHtml = (record = {}, type = 'income', paymentDate = null, associatedClientId = null) => {
             let paymentHtml = '';
             if (paymentDate) {
                 paymentHtml = `
@@ -2709,6 +2859,7 @@ const getStaleClientsForArchiving = () => {
             return `
                 ${getFinancialRecordFormHtml.content = /*html*/`
                 <div class="form-grid">
+                <input type="hidden" id="fin-client-id" value="${record.clientId || associatedClientId || ''}">
                     <div class="form-group full-width">
                         <label for="fin-description">Descrição</label>
                         <input type="text" id="fin-description" value="${record.description || ''}" placeholder="${type === 'income' ? 'Ex: Comissão Venda Apto 101' : 'Ex: Parcela do carro'}">
@@ -2804,8 +2955,7 @@ const getStaleClientsForArchiving = () => {
         });
         
         const renderFinancialBI = () => {
-            const container = document.getElementById('financial-bi-content');
-            
+            // 1. MANTENHA TODA A LÓGICA DE CÁLCULO que você já tinha
             let realizedRevenue = 0;
             let realizedExpense = 0;
 
@@ -2823,46 +2973,246 @@ const getStaleClientsForArchiving = () => {
             const futureRevenue = financialAlerts.filter(a => a.type === 'income').reduce((sum, a) => sum + a.value, 0);
             const futureExpense = financialAlerts.filter(a => a.type === 'expense').reduce((sum, a) => sum + a.value, 0);
 
-            container.innerHTML = `
-                <div class="financial-card metric-card">
-                    <div class="metric-card-content">
-                        <i class="fas fa-arrow-up metric-icon" style="color:var(--success-color); background-color:#eafaf1;"></i>
-                        <div>
-                            <h3>Receita Realizada (Recebida)</h3>
-                            <p class="metric-value" style="color:var(--success-color);">${formatCurrency(realizedRevenue)}</p>
-                        </div>
+            // 2. ATUALIZE OS ELEMENTOS DO NOVO HTML (ao invés de usar container.innerHTML)
+            const biRevenueEl = document.getElementById('bi-realized-revenue');
+            const biExpenseEl = document.getElementById('bi-realized-expense');
+            const biBalanceEl = document.getElementById('bi-balance');
+            const biFutureRevenueEl = document.getElementById('bi-future-revenue');
+            const biFutureExpenseEl = document.getElementById('bi-future-expense');
+
+            if (biRevenueEl) biRevenueEl.textContent = formatCurrency(realizedRevenue);
+            if (biExpenseEl) biExpenseEl.textContent = formatCurrency(realizedExpense);
+            if (biBalanceEl) biBalanceEl.textContent = formatCurrency(balance);
+            if (biFutureRevenueEl) biFutureRevenueEl.textContent = `+ ${formatCurrency(futureRevenue)}`;
+            if (biFutureExpenseEl) biFutureExpenseEl.textContent = `- ${formatCurrency(futureExpense)}`;
+        };
+// =========================================================
+        // INÍCIO: NOVAS FUNÇÕES DE FILTRO DE PENDÊNCIAS
+        // =========================================================
+
+        /**
+         * PASSO 1 - PARTE A: Esta função cria o HTML do modal com os filtros.
+         */
+        const openFilteredPendingPaymentsModal = () => {
+            // 1. Pega informações da data atual para os filtros
+            const today = new Date();
+            const currentMonth = today.getMonth(); // 0 = Jan, 11 = Dez
+            const currentYear = today.getFullYear();
+
+            // 2. Cria o HTML para o corpo do modal
+            const modalHtml = `
+                <div class="toolbar" style="margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+                    <div class="form-group" style="flex-grow: 1; min-width: 120px;">
+                        <label for="filter-payment-type">Tipo</label>
+                        <select id="filter-payment-type">
+                            <option value="all">Todos</option>
+                            <option value="income">Receitas</option>
+                            <option value="expense">Despesas</option>
+                        </select>
                     </div>
+                    <div class="form-group" style="flex-grow: 2; min-width: 200px;">
+                        <label for="filter-payment-period">Período</label>
+                        <select id="filter-payment-period">
+                            <option value="all">Todos os Pendentes</option>
+                            <option value="overdue">Apenas Vencidos</option>
+                            <option value="7days">Próximos 7 dias</option>
+                            <option value="30days">Próximos 30 dias</option>
+                            <option value="month-${currentYear}-${currentMonth}">Este Mês (${today.toLocaleString('pt-BR', { month: 'long' })})</option>
+                            <option value="month-${currentYear}-${currentMonth + 1}">Próximo Mês</option>
+                        </select>
+                    </div>
+                    <button id="apply-payment-filter-btn" class="btn-primary" style="align-self: flex-end;">Filtrar</button>
                 </div>
-                 <div class="financial-card metric-card">
-                    <div class="metric-card-content">
-                        <i class="fas fa-arrow-down metric-icon" style="color:var(--danger-color); background-color:#fbeee C;"></i>
-                        <div>
-                            <h3>Despesa Realizada (Paga)</h3>
-                            <p class="metric-value" style="color:var(--danger-color);">${formatCurrency(realizedExpense)}</p>
-                        </div>
-                    </div>
-                </div>
-                 <div class="financial-card metric-card">
-                    <div class="metric-card-content">
-                        <i class="fas fa-balance-scale metric-icon"></i>
-                        <div>
-                            <h3>Saldo Atual</h3>
-                            <p class="metric-value">${formatCurrency(balance)}</p>
-                        </div>
-                    </div>
-                </div>
-                 <div class="financial-card metric-card">
-                    <div class="metric-card-content">
-                        <i class="fas fa-calendar-alt metric-icon"></i>
-                        <div>
-                            <h3>Próximos 30 dias (a vencer)</h3>
-                            <p style="color:var(--success-color);">+ ${formatCurrency(futureRevenue)}</p>
-                            <p style="color:var(--danger-color);">- ${formatCurrency(futureExpense)}</p>
-                        </div>
-                    </div>
+                
+                <div id="filtered-payments-results" class="day-events-list" style="max-height: 50vh; overflow-y: auto;">
+                    <p style="text-align: center; opacity: 0.7;">Clique em "Filtrar" para ver os resultados.</p>
                 </div>
             `;
+
+            // 3. Abre o modal usando a função que já existe
+            // Usamos um novo 'entityType' para que o código saiba qual modal está aberto
+            openModal('Filtrar Lançamentos Pendentes', modalHtml, 'pending-payments-filter-view', null, false);
+
+            // 4. Adiciona o "ouvinte" para o botão "Filtrar" que acabamos de criar
+            // Isso só funciona DEPOIS que o modal está aberto (linha acima)
+            document.getElementById('apply-payment-filter-btn').addEventListener('click', renderFilteredPendingList);
+            
+            // 5. Opcional: Roda o filtro uma vez com a opção "Todos"
+            renderFilteredPendingList();
         };
+
+        /**
+         * PASSO 1 - PARTE B: Esta função lê os filtros e mostra a lista de resultados.
+         */
+        const renderFilteredPendingList = () => {
+            const resultsContainer = document.getElementById('filtered-payments-results');
+            if (!resultsContainer) return; // Checagem de segurança
+
+            // 1. Pega os valores dos filtros que o usuário escolheu
+            const filterType = document.getElementById('filter-payment-type').value;
+            const filterPeriod = document.getElementById('filter-payment-period').value;
+
+            // 2. Prepara as datas para o filtro de período
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Zera o horário para comparações
+            
+            let startDate = null; // Data de início do filtro
+            let endDate = null;   // Data de fim do filtro
+
+            if (filterPeriod === 'overdue') {
+                // "Vencidos" significa qualquer data ANTERIOR a hoje
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() - 1); // Ontem
+            } else if (filterPeriod === '7days') {
+                startDate = new Date(today);
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() + 7);
+            } else if (filterPeriod === '30days') {
+                startDate = new Date(today);
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() + 30);
+            } else if (filterPeriod.startsWith('month-')) {
+                // Filtro de "Este Mês" ou "Próximo Mês"
+                const [, yearStr, monthStr] = filterPeriod.split('-');
+                const year = parseInt(yearStr);
+                const month = parseInt(monthStr); // JS Mês (0-11)
+                startDate = new Date(year, month, 1);
+                endDate = new Date(year, month + 1, 0); // Pega o último dia do mês
+            }
+            // Se for 'all', startDate e endDate ficam nulos
+
+            // 3. Coleta e filtra todos os pagamentos
+            const pendingItems = [];
+            db.financialRecords.forEach(record => {
+                // --- Filtro por TIPO ---
+                if (filterType !== 'all' && record.type !== filterType) {
+                    return; // Pula este lançamento se não for do tipo certo
+                }
+
+                // Itera sobre as parcelas de cada lançamento
+                record.payments.forEach(payment => {
+                    if (payment.status === 'pending') {
+                        const paymentDate = new Date(payment.date + 'T00:00:00');
+
+                        // --- Filtro por DATA ---
+                        let dateMatch = false;
+                        if (filterPeriod === 'all') {
+                            dateMatch = true; // Se for "Todos", sempre inclui
+                        } else if (filterPeriod === 'overdue') {
+                            if (paymentDate < today) dateMatch = true; // Se for vencido
+                        } else if (startDate && endDate) {
+                            // Se estiver dentro do intervalo (ex: Próximos 7 dias)
+                            if (paymentDate >= startDate && paymentDate <= endDate) dateMatch = true;
+                        }
+                        
+                        // Se passou nos filtros, adiciona na lista
+                        if (dateMatch) {
+                            pendingItems.push({
+                                recordId: record.id,
+                                paymentDate: payment.date,
+                                description: record.description,
+                                value: record.value,
+                                type: record.type,
+                                isOverdue: paymentDate < today // Guarda se está vencido
+                            });
+                        }
+                    }
+                });
+            });
+
+            // 4. Ordena por data (mais antigos primeiro)
+            pendingItems.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate));
+
+            // 5. Constrói o HTML da lista de resultados
+            let listHtml = '';
+            if (pendingItems.length === 0) {
+                listHtml = '<p style="text-align: center; opacity: 0.7;">Nenhum lançamento encontrado com esses filtros.</p>';
+            } else {
+                pendingItems.forEach(item => {
+                    const typeClass = item.type === 'income' ? 'highlight-success' : 'highlight-danger';
+                    const icon = item.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
+                    // Adiciona a classe 'overdue' (vencido) se a data já passou
+                    const overdueClass = item.isOverdue ? 'overdue' : ''; 
+
+                    listHtml += `
+                        <div class="event-item ${overdueClass}" data-record-id="${item.recordId}" data-payment-date="${item.paymentDate}" style="cursor: pointer;" title="Clique para confirmar/editar">
+                            <h4>
+                                <i class="fas ${icon}" style="color:${item.type === 'income' ? 'var(--success-color)' : 'var(--danger-color)'};"></i>
+                                ${item.description}
+                            </h4>
+                            <p>
+                                <strong>Vencimento:</strong> ${formatDate(item.paymentDate)} | 
+                                <strong class="${typeClass}">Valor: ${formatCurrency(item.value)}</strong>
+                            </p>
+                        </div>
+                    `;
+                });
+            }
+
+            // 6. Coloca o HTML final dentro do modal
+            resultsContainer.innerHTML = listHtml;
+        };
+
+        // =========================================================
+        // FIM: NOVAS FUNÇÕES DE FILTRO DE PENDÊNCIAS
+        // =========================================================
+const openPendingPaymentsModal = () => {
+    // 1. Coleta todos os pagamentos com status "pending"
+    const pendingItems = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    db.financialRecords.forEach(record => {
+        record.payments.forEach(payment => {
+            if (payment.status === 'pending') {
+                const paymentDate = new Date(payment.date + 'T00:00:00');
+                pendingItems.push({
+                    recordId: record.id,
+                    paymentDate: payment.date,
+                    description: record.description,
+                    value: record.value,
+                    type: record.type,
+                    isOverdue: paymentDate < today
+                });
+            }
+        });
+    });
+
+    // 2. Ordena pela data de vencimento (os mais antigos primeiro)
+    pendingItems.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate));
+
+    // 3. Cria o HTML para o modal
+    // Vamos reutilizar os estilos da agenda (.day-events-list) para ficar bonito
+    let modalHtml = '<div class="day-events-list" style="max-height: 60vh; overflow-y: auto;">'; 
+
+    if (pendingItems.length === 0) {
+        modalHtml += '<p>Nenhum lançamento pendente encontrado.</p>';
+    } else {
+        pendingItems.forEach(item => {
+            const typeClass = item.type === 'income' ? 'highlight-success' : 'highlight-danger';
+            const icon = item.type === 'income' ? 'fa-arrow-up' : 'fa-arrow-down';
+            // Adiciona a classe 'overdue' (vencido) se a data já passou
+            const overdueClass = item.isOverdue ? 'overdue' : ''; 
+
+            modalHtml += `
+                <div class="event-item ${overdueClass}" data-record-id="${item.recordId}" data-payment-date="${item.paymentDate}" style="cursor: pointer;" title="Clique para confirmar/editar">
+                    <h4>
+                        <i class="fas ${icon}" style="color:${item.type === 'income' ? 'var(--success-color)' : 'var(--danger-color)'};"></i>
+                        ${item.description}
+                    </h4>
+                    <p>
+                        <strong>Vencimento:</strong> ${formatDate(item.paymentDate)} | 
+                        <strong class="${typeClass}">Valor: ${formatCurrency(item.value)}</strong>
+                    </p>
+                </div>
+            `;
+        });
+    }
+    modalHtml += '</div>';
+
+    // 4. Abre o modal
+    openModal('Todos os Lançamentos Pendentes', modalHtml, 'pending-payments-view', null, false); // false = sem botões "Salvar/Cancelar"
+};
 
         // ==========================================
         // GESTÃO DE CONFIGURAÇÕES
@@ -3284,13 +3634,16 @@ const getStaleClientsForArchiving = () => {
             
             let amenitiesHtml = '';
             if (prop.amenities && prop.amenities.length > 0) {
+                // MUDANÇA 1: Formata a capitalização dos diferenciais
                 const amenitiesItems = prop.amenities.map(amenityName => {
                     const amenityData = db.amenities.find(a => a.name === amenityName);
                     const iconClass = amenityData ? amenityData.icon : 'fas fa-check';
+                    // Linha abaixo é a única modificada
+                    const capitalizedName = amenityName.charAt(0).toUpperCase() + amenityName.slice(1).toLowerCase();
                     return `
                         <div class="amenity-display-item">
                             <i class="${iconClass}"></i>
-                            <span>${amenityName}</span>
+                            <span>${capitalizedName}</span>
                         </div>
                     `;
                 }).join('');
@@ -3335,12 +3688,22 @@ const getStaleClientsForArchiving = () => {
                 ${mainImageHtml}
                 <h3>${prop.name || ''}</h3>
                 <p><strong>Localização:</strong> ${prop.location || ''}</p>
-                <p><strong>Valor de Tabela:</strong> ${formatCurrency(prop.listPrice)}</p>
-                ${!forClient ? `<p><strong>Valor de Avaliação:</strong> ${formatCurrency(prop.evalPrice)}</p>` : ''}
-                ${requiredIncome > 0 ? `<p><strong>Renda Mínima Necessária (Estimada):</strong> ${formatCurrency(requiredIncome)}</p>` : ''}
-                <p><strong>Data de Entrega Prevista:</strong> ${formatDate(prop.deliveryDate)}</p>
+            ${prop.areaPrivativa > 0 ? `<p><strong>Área Privativa:</strong> ${prop.areaPrivativa} m²</p>` : ''}
+            <p><strong>Valor de Tabela:</strong> ${formatCurrency(prop.listPrice)}</p>
+            ${!forClient ? `<p><strong>Valor de Avaliação:</strong> ${formatCurrency(prop.evalPrice)}</p>` : ''}
+            ${requiredIncome > 0 ? `<p><strong>Renda Mínima Necessária (Estimada):</strong> ${formatCurrency(requiredIncome)}</p>` : ''}
+            ${prop.condoFee > 0 ? `<p><strong>Condomínio Estimado:</strong> ${formatCurrency(prop.condoFee)}</p>` : ''}
+            <p><strong>Data de Entrega Prevista:</strong> ${formatDate(prop.deliveryDate)}</p>
+
+            ${(prop.sinal > 0 || prop.parcelasEntrada || prop.parcelasSemestrais) ? '<h3 style="margin-top: 1.5rem;">Condições de Pagamento</h3>' : ''}
+            ${prop.sinal > 0 ? `<p><strong>Sinal:</strong> ${formatCurrency(prop.sinal)}</p>` : ''}
+            ${prop.parcelasEntrada ? `<p><strong>Parcelas Entrada:</strong> ${prop.parcelasEntrada}</p>` : ''}
+            ${prop.parcelasSemestrais ? `<p><strong>Parcelas Semestrais:</strong> ${prop.parcelasSemestrais}</p>` : ''}
+            ${prop.devFinancing ? `<p><strong>Financiamento Construtora:</strong> ${prop.devFinancing}</p>` : ''}
                 ${linkHtml}
                 
+                ${prop.otherInfo ? `<h3>Outras Informações</h3><p>${prop.otherInfo.replace(/\n/g, '<br>')}</p>` : ''}
+
                 <h3>Descrição</h3>
                 <p>${(prop.description || 'Nenhuma descrição textual fornecida.').replace(/\n/g, '<br>')}</p>
 
@@ -3443,22 +3806,26 @@ const getStaleClientsForArchiving = () => {
                 }
                 while (images.length < 3) images.push(placeholderImg);
 
+                // Formata os diferenciais (primeira letra maiúscula)
                 const amenitiesHtml = (prop.amenities && prop.amenities.length > 0)
                     ? prop.amenities.slice(0, 10).map(amenityName => {
                         const amenityData = db.amenities.find(a => a.name === amenityName);
                         const iconClass = amenityData ? amenityData.icon : 'fas fa-check-square';
-                        return `<div class="portfolio-v2-amenity-item"><i class="${iconClass}"></i><span>${amenityName}</span></div>`;
+                        const capitalizedName = amenityName.charAt(0).toUpperCase() + amenityName.slice(1).toLowerCase();
+                        return `<div class="portfolio-v2-amenity-item"><i class="${iconClass}"></i><span>${capitalizedName}</span></div>`;
                     }).join('')
                     : '<p>Consulte os diferenciais deste empreendimento.</p>';
                 
+                // MUDANÇA DO CABEÇALHO (ADIÇÃO DO SPACER):
                 const pageHtml = `
                     <div class="portfolio-page-v2">
                         <header class="portfolio-v2-header">
+                            <img src="${db.settings.logoUrl}" class="portfolio-v2-logo">
                             <div class="portfolio-v2-broker-info">
                                 <h1>${db.settings.brokerName}</h1>
-                                <p>${db.settings.brokerCreci} | ${db.settings.brokerPhone}</p>
+                                <p>${db.settings.brokerCreci}</p>
                             </div>
-                            <img src="${db.settings.logoUrl}" class="portfolio-v2-logo">
+                            <div style="width: 40mm; height: 15mm; flex-shrink: 0;"></div>
                         </header>
                         <div class="portfolio-v2-title">
                             <h2>${prop.name}</h2>
@@ -3473,11 +3840,24 @@ const getStaleClientsForArchiving = () => {
                             <div class="portfolio-v2-details">
                                 <h3>Sobre o Imóvel</h3>
                                 <p class="portfolio-v2-description">${(prop.description || 'Descrição não disponível.').replace(/\n/g, '<br>')}</p>
+                                
                                 <div class="portfolio-v2-key-info">
                                     <p><strong>Valor( a partir):</strong> ${formatCurrency(prop.listPrice)}</p>
+                                    ${prop.areaPrivativa > 0 ? `<p><strong>Área Privativa:</strong> ${prop.areaPrivativa} m²</p>` : ''}
+                                    ${prop.condoFee > 0 ? `<p><strong>Condomínio (Est.):</strong> ${formatCurrency(prop.condoFee)}</p>` : ''}
                                     <p><strong>Entrega:</strong> ${formatDate(prop.deliveryDate) || 'A definir'}</p>
-                                    <p><small>*Valor e disponibilidade sujeitos a alteração sem aviso prévio.</small></p>
+                                    ${prop.sinal > 0 ? `<p><strong>Sinal:</strong> ${formatCurrency(prop.sinal)}</p>` : ''}
+                                    ${prop.parcelasEntrada ? `<p style="font-size: 9pt;"><strong>Parcelas Entrada:</strong> ${prop.parcelasEntrada}</p>` : ''}
+                                    ${prop.parcelasSemestrais ? `<p style="font-size: 9pt;"><strong>Parcelas Semestrais:</strong> ${prop.parcelasSemestrais}</p>` : ''}
+                                    ${prop.devFinancing ? `<p style="font-size: 9pt;"><strong>Financ. Construtora:</strong> ${prop.devFinancing}</p>` : ''}
+                                    <p style="margin-top: 5px;"><small>*Valor e disponibilidade sujeitos a alteração.</small></p>
                                 </div>
+                                
+                                ${prop.otherInfo ? `
+                                    <h3 style="margin-top: 4mm;">Outras Informações</h3>
+                                    <p class="portfolio-v2-description" style="font-size: 9pt;">${prop.otherInfo.replace(/\n/g, '<br>')}</p>
+                                ` : ''}
+
                             </div>
                             <div class="portfolio-v2-amenities">
                                 <h3>Diferenciais</h3>
@@ -3503,7 +3883,26 @@ const getStaleClientsForArchiving = () => {
                 }
             }
 
-            pdf.save(`Portfolio_Imoveis_${new Date().toISOString().slice(0,10)}.pdf`);
+            // === INÍCIO DA MODIFICAÇÃO (Nome do Arquivo Dinâmico) ===
+let fileName = '';
+if (propertyIds.length === 1) {
+    // Se for apenas UM imóvel, pegue o nome dele
+    const prop = db.properties.find(p => p.id == propertyIds[0]);
+    if (prop && prop.name) {
+        // Limpa o nome para que seja seguro para um arquivo (remove caracteres inválidos e substitui espaços por '_')
+        const safeName = prop.name.replace(/[^a-z0-9_ -]/gi, '').trim().replace(/\s+/g, '_');
+        fileName = `Portfolio_${safeName}.pdf`;
+    } else {
+        // Fallback (caso não ache o nome)
+        fileName = `Portfolio_Imovel_${new Date().toISOString().slice(0,10)}.pdf`;
+    }
+} else {
+    // Se forem VÁRIOS imóveis, use um nome genérico
+    fileName = `Portfolio_Varios_Imoveis_${new Date().toISOString().slice(0,10)}.pdf`;
+}
+
+pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
+// === FIM DA MODIFICAÇÃO ===
             pdfContainer.innerHTML = '';
             modalSaveBtn.disabled = false;
             closeModal();
@@ -4085,63 +4484,136 @@ const getStaleClientsForArchiving = () => {
         // LÓGICA DE SALVAMENTO DO MODAL (ATUALIZADA)
         // ==========================================
         modalSaveBtn.addEventListener('click', async () => {
+            // [INÍCIO DO CÓDIGO DE CORREÇÃO]
             if (currentEntityType === 'client') {
-                // 1. Coletamos os dados do formulário
+                // 1. LER OS DADOS DO FORMULÁRIO (Esta era a parte que faltava)
                 const clientData = {
-                    id: currentEditingId || Date.now() + Math.random(), name: document.getElementById('client-name').value, phone: document.getElementById('client-phone').value,
-                    email: document.getElementById('client-email').value, cpf: document.getElementById('client-cpf').value, birthdate: document.getElementById('client-birthdate').value,
-                    income: parseFloat(document.getElementById('client-income').value) || 0, propertyValue: parseFloat(document.getElementById('client-property-value').value) || 0,
-                    commission: parseFloat(document.getElementById('client-commission').value) || null, stageId: parseInt(document.getElementById('client-stageId').value),
-                    leadSource: document.getElementById('client-lead-source').value, propertyId: document.getElementById('client-propertyId').value, notes: document.getElementById('client-notes').value,
-                    lastContact: currentEditingId ? db.clients.find(c=>c.id==currentEditingId).lastContact : null
+                    id: currentEditingId || Date.now() + Math.random(),
+                    name: document.getElementById('client-name').value,
+                    phone: (() => {
+    const rawPhone = document.getElementById('client-phone').value;
+    let cleanPhone = (rawPhone || '').replace(/\D/g, ''); // Remove todos os não-dígitos
+    // Adiciona o 55 se não começar com ele e tiver algum número
+    if (cleanPhone.length > 0 && !cleanPhone.startsWith('55')) {
+        cleanPhone = '55' + cleanPhone;
+    }
+    return cleanPhone;
+})(),
+                    email: document.getElementById('client-email').value,
+                    cpf: document.getElementById('client-cpf').value,
+                    birthdate: document.getElementById('client-birthdate').value,
+                    income: parseFloat(document.getElementById('client-income').value) || 0,
+                    propertyValue: parseFloat(document.getElementById('client-property-value').value) || 0,
+                    commission: parseFloat(document.getElementById('client-commission').value) || null,
+                    stageId: parseInt(document.getElementById('client-stageId').value, 10), // <-- Aqui está a etapa do funil
+                    leadSource: document.getElementById('client-lead-source').value,
+                    propertyId: document.getElementById('client-propertyId').value,
+                    notes: document.getElementById('client-notes').value,
+                    notes: document.getElementById('client-notes').value,
+                    hasFormalWork: document.getElementById('client-formal-work').checked,
+                    // Manter dados existentes se estiver editando
+                    lastContact: currentEditingId ? db.clients.find(c => c.id == currentEditingId).lastContact : null,
+                    contactHistory: currentEditingId ? db.clients.find(c => c.id == currentEditingId).contactHistory : []
                 };
 
-                // 2. Padronizamos os dados de verificação (telefone e CPF), removendo letras e símbolos
-                const newPhone = (clientData.phone || '').replace(/\D/g, '');
-                const newCpf = (clientData.cpf || '').replace(/\D/g, '');
-
+                // 2. LÓGICA PARA EDITAR (currentEditingId existe)
                 if(currentEditingId) {
-                    // 3. Se estiver EDITANDO, apenas salve (lógica original)
                     const index = db.clients.findIndex(c => c.id == currentEditingId);
-                    if (index > -1) db.clients[index] = clientData;
-                } else {
-                    // 4. Se estiver ADICIONANDO UM NOVO CLIENTE, fazemos a verificação
+                    if (index > -1) {
+                        const oldClient = db.clients[index];
+                        const newStageId = clientData.stageId; // Agora 'clientData' existe
+                        const oldStageId = oldClient.stageId;
+                        const vendaStage = db.funnelStages.find(s => s.name.toLowerCase() === 'venda');
+                        const vendaStageId = vendaStage ? vendaStage.id : null;
+
+                        // Salva os dados do cliente na variável principal
+                        db.clients[index] = clientData;
+
+                        // ===== LÓGICA DE GESTÃO DE RECEITA AUTOMÁTICA (COPIADA DO SEU CÓDIGO) =====
+                        if (vendaStageId && newStageId === vendaStageId && oldStageId !== newStageId) {
+                            const existingRevenue = db.financialRecords.find(r => r.clientId == clientData.id && r.type === 'income' && r.category === 'Comissão');
+                            if (!existingRevenue && confirm('Cliente movido para "Venda"! Deseja lançar a receita de comissão agora?')) {
+                                const property = db.properties.find(p => p.id == clientData.propertyId);
+                                const propertyValue = property ? property.listPrice : (clientData.propertyValue || 0);
+                                const commissionRate = (clientData.commission || db.settings.defaultCommission || 5);
+                                const commissionValue = (propertyValue * commissionRate) / 100;
+                                const prefilledRecord = {
+                                    description: `Comissão Venda - ${clientData.name}${property ? ' (' + property.name + ')' : ''}`,
+                                    value: commissionValue, category: 'Comissão', startDate: new Date().toISOString().slice(0, 10),
+                                    recurrence: 'none', totalInstallments: 1, clientId: clientData.id
+                                };
+                                openModal('Lançar Receita de Venda', getFinancialRecordFormHtml(prefilledRecord, 'income', null, clientData.id), 'financialRecord', 'income');
+                                await saveData();
+                                return;
+                            }
+                        } else if (vendaStageId && oldStageId === vendaStageId && newStageId !== vendaStageId) {
+                            const linkedRevenue = db.financialRecords.find(r => r.clientId == clientData.id && r.type === 'income' && r.category === 'Comissão');
+                            if (linkedRevenue) {
+                                const allPending = linkedRevenue.payments.every(p => p.status === 'pending');
+                                if (allPending) {
+                                    if (confirm('Este cliente voltou uma etapa e possui uma comissão pendente. Deseja cancelar (excluir) esta receita agora?')) {
+                                        db.financialRecords = db.financialRecords.filter(r => r.id !== linkedRevenue.id);
+                                        const toast = document.getElementById('quick-actions-toast');
+                                        if (toast) {
+                                            toast.textContent = 'Receita de comissão cancelada.';
+                                            toast.style.display = 'block';
+                                            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                                        }
+                                    }
+                                } else {
+                                    alert('Este cliente voltou uma etapa, mas a comissão associada a ele já foi marcada como paga e não pode ser excluída automaticamente.');
+                                }
+                            }
+                        }
+                    }
+                } 
+                // 3. LÓGICA PARA ADICIONAR NOVO (currentEditingId não existe)
+                else {
+                    const newPhone = (clientData.phone || '').replace(/\D/g, '');
+                    const newCpf = (clientData.cpf || '').replace(/\D/g, '');
                     let existingClient = null;
 
-                    // Tenta encontrar por telefone (se o telefone foi preenchido)
                     if (newPhone.length > 0) {
                         existingClient = db.clients.find(c => (c.phone || '').replace(/\D/g, '') === newPhone);
                     }
-
-                    // Se não achou por telefone, tenta por CPF (se o CPF foi preenchido)
                     if (!existingClient && newCpf.length > 0) {
                         existingClient = db.clients.find(c => (c.cpf || '').replace(/\D/g, '') === newCpf);
                     }
 
-                    // 5. Verificamos o resultado
                     if (existingClient) {
-                        // DUPLICADO! Mostra o alerta e PARA o salvamento
                         openAlertModal('Cliente Duplicado', 
                             `<p><i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> Um cliente já está cadastrado com este telefone ou CPF.</p>
                              <p style="margin-top: 10px;"><strong>Nome:</strong> ${existingClient.name}<br>
                              <strong>Telefone:</strong> ${existingClient.phone || 'N/A'}</p>`
                         );
-                        return; // Impede que o restante do código de salvar seja executado
+                        return; // Para o salvamento
                     } else {
-                        // NÃO DUPLICADO! Adiciona o cliente (lógica original)
-                        db.clients.push(clientData);
+                        db.clients.push(clientData); // Salva o novo cliente
                     }
                 }
             }
             if (currentEntityType === 'property') {
                 const selectedAmenities = Array.from(document.querySelectorAll('input[name="amenities"]:checked')).map(cb => cb.value);
                 const propData = {
-                    id: currentEditingId || Date.now() + Math.random(), name: document.getElementById('prop-name').value, location: document.getElementById('prop-location').value,
-                    listPrice: parseFloat(document.getElementById('prop-list-price').value) || 0, evalPrice: parseFloat(document.getElementById('prop-eval-price').value) || 0,
-                    deliveryDate: document.getElementById('prop-delivery-date').value, link: document.getElementById('prop-link').value, 
-                    videoLink: document.getElementById('prop-video-link').value, description: document.getElementById('prop-description').value,
-                    images: tempPropertyImages, mainImageIndex: tempMainImageIndex, amenities: selectedAmenities
-                };
+                id: currentEditingId || Date.now() + Math.random(), name: document.getElementById('prop-name').value, location: document.getElementById('prop-location').value,
+                listPrice: parseFloat(document.getElementById('prop-list-price').value) || 0, evalPrice: parseFloat(document.getElementById('prop-eval-price').value) || 0,
+                // --- INÍCIO DA ADIÇÃO ---
+                areaPrivativa: parseFloat(document.getElementById('prop-area-privativa').value) || 0,
+                sinal: parseFloat(document.getElementById('prop-sinal').value) || 0,
+                parcelasEntrada: document.getElementById('prop-parcelas-entrada').value,
+                parcelasSemestrais: document.getElementById('prop-parcelas-semestrais').value,
+                // --- FIM DA ADIÇÃO ---
+                // (COLE O NOVO CÓDIGO AQUI)
+                deliveryDate: document.getElementById('prop-delivery-date').value, 
+                link: document.getElementById('prop-link').value, 
+                videoLink: getEmbedUrl(document.getElementById('prop-video-link').value),
+                description: document.getElementById('prop-description').value, // <-- CORRIGIDO
+                condoFee: parseFloat(document.getElementById('prop-condo-fee').value) || 0,
+// (FIM DO NOVO CÓDIGO)
+                devFinancing: document.getElementById('prop-dev-financing').value,
+                otherInfo: document.getElementById('prop-other-info').value,
+                images: tempPropertyImages, mainImageIndex: tempMainImageIndex, amenities: selectedAmenities
+            };
                  if(currentEditingId) {
                     const index = db.properties.findIndex(p => p.id == currentEditingId);
                     if (index > -1) db.properties[index] = propData;
@@ -4206,16 +4678,17 @@ const getStaleClientsForArchiving = () => {
                 let existingRecord = isEditing ? db.financialRecords.find(r => r.id == currentEditingId) : {};
 
                 const recordData = {
-                    ...existingRecord,
-                    id: isEditing ? currentEditingId : Date.now() + Math.random(),
-                    description: document.getElementById('fin-description').value,
-                    value: parseFloat(document.getElementById('fin-value').value) || 0,
-                    category: document.getElementById('fin-category').value,
-                    startDate: document.getElementById('fin-start-date').value,
-                    recurrence: document.getElementById('fin-recurrence').value,
-                    totalInstallments: parseInt(document.getElementById('fin-installments').value) || 1,
-                    type: isEditing ? existingRecord.type : currentEditingId,
-                };
+                ...existingRecord,
+                id: isEditing ? currentEditingId : Date.now() + Math.random(),
+                description: document.getElementById('fin-description').value,
+                value: parseFloat(document.getElementById('fin-value').value) || 0,
+                category: document.getElementById('fin-category').value,
+                startDate: document.getElementById('fin-start-date').value,
+                recurrence: document.getElementById('fin-recurrence').value,
+                totalInstallments: parseInt(document.getElementById('fin-installments').value) || 1,
+                type: isEditing ? existingRecord.type : currentEditingId,
+                clientId: document.getElementById('fin-client-id').value || null, // ADICIONE ESTA LINHA
+            };
                 
                 const needsPaymentUpdate = !isEditing || 
                                            recordData.startDate !== existingRecord.startDate ||
@@ -4287,7 +4760,6 @@ const getStaleClientsForArchiving = () => {
             const activePanelId = document.querySelector('.panel.active')?.id.replace('panel-', '');
             if(activePanelId) switchPanel(activePanelId);
         });
-
 
         // ==========================================
         // DASHBOARD (COM ALERTAS FINANCEIROS)
@@ -4424,6 +4896,12 @@ const getStaleClientsForArchiving = () => {
                 }
             }
         });
+document.getElementById('financial-bi-content').addEventListener('click', (e) => {
+            const pendingCard = e.target.closest('#card-pending-payments');
+            if (pendingCard) {
+                openFilteredPendingPaymentsModal(); // <-- MUDANÇA FEITA AQUI
+            }
+        });
         
         const confirmPayment = async () => {
             if (!currentEditingId || !currentPaymentDateToConfirm) return;
@@ -4441,6 +4919,106 @@ const getStaleClientsForArchiving = () => {
                 renderFinancialBI();
             }
         };
+modalBody.addEventListener('click', e => {
+            
+            // Lógica 1: Clique nos eventos do dia (da Agenda)
+            if (currentEntityType === 'day-view') {
+                const button = e.target.closest('button');
+                if (!button) return;
+                
+                const eventItem = button.closest('.event-item');
+                if(!eventItem) return;
+                const id = eventItem.dataset.id;
+                const action = button.dataset.action;
+                const event = db.events.find(ev => ev.id == id);
+                
+                if (action === 'edit') {
+                    closeModal();
+                    openModal('Editar Compromisso', getEventFormHtml(event), 'event', id);
+                } else if (action === 'delete') {
+                    if (confirm('Deseja excluir este compromisso?')) {
+                        db.events = db.events.filter(ev => ev.id != id);
+                        saveData();
+                        closeModal();
+                        renderAgendaCalendar();
+                    }
+                } else if (action === 'toggle-complete') {
+                    event.completed = !event.completed;
+                    saveData();
+                    closeModal();
+                    renderAgendaCalendar();
+                }
+
+            // Lógica 2: Clique na lista de pagamentos pendentes (DO MODAL ANTIGO OU DO NOVO FILTRO)
+            } else if (currentEntityType === 'pending-payments-view' || currentEntityType === 'pending-payments-filter-view') { // <-- MUDANÇA FEITA AQUI
+                const item = e.target.closest('.event-item');
+                if (item) {
+                    const recordId = item.dataset.recordId;
+                    const paymentDate = item.dataset.paymentDate;
+                    const record = db.financialRecords.find(r => r.id == recordId);
+        
+                    if (record) {
+                        currentPaymentDateToConfirm = paymentDate; 
+                        closeModal(); // Fecha o modal da lista ou do filtro
+                        // Abre o modal de confirmação
+                        openModal('Confirmar ou Editar Lançamento', getFinancialRecordFormHtml(record, record.type, paymentDate), 'financialRecord', record.id);
+                    }
+                }
+                
+            // Lógica 3: Clique na galeria de imagens (das Notas) - Lógica original
+            } else if (currentEntityType === 'view') {
+                 const galleryImg = e.target.closest('.note-gallery-img');
+                 if (galleryImg) {
+                    const noteId = galleryImg.closest('.view-note-gallery').dataset.noteId;
+                    const startIndex = parseInt(galleryImg.dataset.index, 10);
+                    openImageGallery({ entity: 'note', id: noteId, startIndex: startIndex });
+                 }
+            
+            // Lógica 4: Clique nas ações rápidas (Agendar Ligação/Mensagem)
+            } else if (currentEntityType === 'view') { // Re-utiliza o 'view'
+                const actionButton = e.target.closest('button[data-action]');
+                if (!actionButton) return;
+                const action = actionButton.dataset.action;
+                const clientId = e.target.closest('.record-details').dataset.clientId;
+                if (!clientId) return; // Só continua se for um view de cliente
+                
+                const client = db.clients.find(c => c.id == clientId);
+                if (!client) return;
+
+                let taskTitle = '';
+                let toastMessage = '';
+
+                if (action === 'schedule-call') {
+                    taskTitle = `Ligar para ${client.name}`;
+                    toastMessage = `Ligação para ${client.name.split(' ')[0]} agendada para amanhã!`;
+                } else if (action === 'schedule-message') {
+                    taskTitle = `Enviar mensagem para ${client.name}`;
+                    toastMessage = `Mensagem para ${client.name.split(' ')[0]} agendada para amanhã!`;
+                }
+
+                if (taskTitle) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    
+                    const newEvent = {
+                        id: Date.now() + Math.random(),
+                        title: taskTitle,
+                        clientId: client.id,
+                        date: tomorrow.toISOString().slice(0, 10),
+                        time: '09:00',
+                        completed: false,
+                        description: 'Atividade gerada automaticamente.',
+                        recurrence: 'none',
+                        endDate: ''
+                    };
+                    db.events.push(newEvent);
+                    client.lastContact = new Date().toISOString().slice(0, 10);
+                    saveData();
+                    showToast(toastMessage);
+                    triggerClientTableRender(); 
+                }
+            }
+        });
 
         modalBody.addEventListener('click', e => {
             const galleryImg = e.target.closest('.note-gallery-img');
@@ -4450,7 +5028,6 @@ const getStaleClientsForArchiving = () => {
                 openImageGallery({ entity: 'note', id: noteId, startIndex: startIndex });
             }
         });
-
         
         const renderFunnelChart = () => {
             const container = document.getElementById('funnel-chart');
@@ -4657,18 +5234,36 @@ const getStaleClientsForArchiving = () => {
         const getEmbedUrl = (url) => {
             if (!url) return null;
             let videoId;
+
+            // 1. Checa se já é um link embed do YouTube
+            if (url.includes('youtube.com/embed/')) {
+                return url.split('?')[0]; // Limpa parâmetros extras e retorna
+            }
+
+            // 2. Checa se é um link 'watch' do YouTube
             if (url.includes('youtube.com/watch?v=')) {
                 videoId = url.split('v=')[1].split('&')[0];
                 return `https://www.youtube.com/embed/${videoId}`;
             }
+
+            // 3. Checa se é um link 'curto' do YouTube
             if (url.includes('youtu.be/')) {
                 videoId = url.split('youtu.be/')[1].split('?')[0];
                 return `https://www.youtube.com/embed/${videoId}`;
             }
+
+            // 4. Checa se já é um link embed do Vimeo
+            if (url.includes('player.vimeo.com/video/')) {
+                return url.split('?')[0]; // Limpa parâmetros extras e retorna
+            }
+
+            // 5. Checa se é um link normal do Vimeo
             if (url.includes('vimeo.com/')) {
                 videoId = url.split('vimeo.com/')[1].split('?')[0];
                 return `https://player.vimeo.com/video/${videoId}`;
             }
+
+            // 6. Se não for nada disso, retorna null
             return null;
         };
 
@@ -4681,44 +5276,46 @@ const getStaleClientsForArchiving = () => {
 
         modalBody.addEventListener('click', e => {
             const actionButton = e.target.closest('button[data-action]');
-            if (!actionButton || currentEntityType !== 'view') return;
+            // Verificamos se é um 'view' e se o botão foi clicado
+            if (!actionButton || currentEntityType !== 'view') return; 
             
             const action = actionButton.dataset.action;
-            const clientId = e.target.closest('.record-details').dataset.clientId;
-            const client = db.clients.find(c => c.id == clientId);
-            if (!client) return;
             
-            let taskTitle = '';
-            let toastMessage = '';
-
-            if (action === 'schedule-call') {
-                taskTitle = `Ligar para ${client.name}`;
-                toastMessage = `Ligação para ${client.name.split(' ')[0]} agendada para amanhã!`;
-            } else if (action === 'schedule-message') {
-                taskTitle = `Enviar mensagem para ${client.name}`;
-                toastMessage = `Mensagem para ${client.name.split(' ')[0]} agendada para amanhã!`;
-            }
-
-            if (taskTitle) {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
+            // Verificamos se é uma ação de agendamento
+            if (action === 'schedule-call' || action === 'schedule-message') {
+                // Encontra o ID do cliente a partir da ficha
+                const clientId = e.target.closest('.record-details').dataset.clientId;
+                if (!clientId) return; // Sai se não for a ficha de um cliente
                 
-                const newEvent = {
-                    id: Date.now() + Math.random(),
+                const client = db.clients.find(c => c.id == clientId);
+                if (!client) return;
+                
+                let taskTitle = '';
+                let modalTitle = '';
+
+                if (action === 'schedule-call') {
+                    taskTitle = `Ligar para ${client.name}`;
+                    modalTitle = 'Agendar Ligação';
+                } else if (action === 'schedule-message') {
+                    taskTitle = `Enviar mensagem para ${client.name}`;
+                    modalTitle = 'Agendar Mensagem';
+                }
+
+                // Prepara o objeto do evento pré-preenchido
+                const today = new Date().toISOString().slice(0, 10);
+                const prefilledEvent = {
                     title: taskTitle,
-                    clientId: client.id,
-                    date: tomorrow.toISOString().slice(0, 10),
-                    time: '09:00',
-                    completed: false,
-                    description: 'Atividade gerada automaticamente.',
-                    recurrence: 'none',
-                    endDate: ''
+                    clientId: client.id, // Associa o cliente
+                    date: today,
+                    time: '09:00' // Deixa um horário padrão
                 };
-                db.events.push(newEvent);
-                client.lastContact = new Date().toISOString().slice(0, 10);
-                saveData();
-                showToast(toastMessage);
-                triggerClientTableRender(); 
+
+                // Fecha o modal ATUAL (da ficha do cliente)
+                closeModal(); 
+                
+                // Abre o modal NOVO (de criar evento)
+                // Passamos 'prefilledEvent' e 'today' para a função que gera o HTML
+                openModal(modalTitle, getEventFormHtml(prefilledEvent, today), 'event');
             }
         });
         
