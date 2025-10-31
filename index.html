@@ -2566,25 +2566,24 @@ const getStaleClientsForArchiving = () => {
                     const eventDateTime = new Date(`${event.date}T${event.time || '00:00:00'}`);
                     const isOverdue = !event.completed && eventDateTime < now;
 
-                    // --- INÍCIO DA MODIFICAÇÃO ---
-                    // 1. Criamos uma variável vazia para o botão
+                    // --- INÍCIO DA MODIFICAÇÃO (Etapa 1 de 2) ---
                     let whatsappButtonHtml = '';
 
-                    // 2. Verificamos as condições:
-                    //    - O evento tem um cliente associado? (client)
-                    //    - Esse cliente tem um telefone? (client.phone)
-                    //    - O título do evento inclui "enviar mensagem"? (event.title.toLowerCase()...)
+                    // Verificamos as condições
                     if (client && client.phone && event.title.toLowerCase().includes('enviar mensagem')) {
-                        const cleanPhone = (client.phone || '').replace(/\D/g, ''); // Limpa o número
+                        const cleanPhone = (client.phone || '').replace(/\D/g, '');
                         
-                        // 3. Se tudo for verdade, criamos o link do WhatsApp
+                        // TROCAMOS o <a> por <button> e adicionamos 'data-action'
                         whatsappButtonHtml = `
-                            <a href="https://wa.me/${cleanPhone}" target="_blank" title="Enviar WhatsApp para ${client.name}" 
-                               style="font-size: 1.2rem; color: #25D366; margin-left: 10px; text-decoration: none;">
+                            <button data-action="day-view-whatsapp" 
+                                    data-client-id="${client.id}" 
+                                    data-phone="${cleanPhone}" 
+                                    title="Enviar WhatsApp e registrar contato" 
+                                    style="font-size: 1.2rem; color: #25D366; margin-left: 10px; background:none; border:none; cursor:pointer; padding:0; vertical-align: middle;">
                                 <i class="fab fa-whatsapp"></i>
-                            </a>`;
+                            </button>`;
                     }
-                    // --- FIM DA MODIFICAÇÃO ---
+                    // --- FIM DA MODIFICAÇÃO (Etapa 1 de 2) ---
                     
                     content += `
                         <div class="event-item ${event.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}" data-id="${event.id}">
@@ -5057,15 +5056,46 @@ document.getElementById('financial-bi-content').addEventListener('click', (e) =>
         };
 modalBody.addEventListener('click', e => {
             
-            // Lógica 1: Clique nos eventos do dia (da Agenda)
+// Lógica 1: Clique nos eventos do dia (da Agenda)
             if (currentEntityType === 'day-view') {
                 const button = e.target.closest('button');
                 if (!button) return;
-                
+
+                const action = button.dataset.action; // Pegamos a ação do botão
+
+                // --- INÍCIO DA NOVA LÓGICA DO WHATSAPP ---
+                if (action === 'day-view-whatsapp') {
+                    const clientId = button.dataset.clientId;
+                    const phone = button.dataset.phone;
+                    const client = db.clients.find(c => c.id == clientId);
+
+                    if (client) {
+                        // 1. Registra o contato no histórico (a lógica que você queria)
+                        client.lastContact = new Date().toISOString().slice(0, 10);
+                        if (!client.contactHistory) {
+                            client.contactHistory = [];
+                        }
+                        client.contactHistory.push({
+                            date: client.lastContact,
+                            stageId: client.stageId
+                        });
+                        saveData();
+                        
+                        // 2. Mostra um feedback
+                        showToast(`Histórico de ${client.name.split(' ')[0]} atualizado!`);
+                        
+                        // 3. Abre o link do WhatsApp
+                        window.open(`https://wa.me/${phone}`, '_blank');
+                    }
+                    return; // Para a execução aqui
+                }
+                // --- FIM DA NOVA LÓGICA DO WHATSAPP ---
+
+                // O restante da lógica (edit, delete, toggle) continua
                 const eventItem = button.closest('.event-item');
                 if(!eventItem) return;
                 const id = eventItem.dataset.id;
-                const action = button.dataset.action;
+                // 'action' já foi definida lá em cima
                 const event = db.events.find(ev => ev.id == id);
                 
                 if (action === 'edit') {
@@ -5085,7 +5115,7 @@ modalBody.addEventListener('click', e => {
                     renderAgendaCalendar();
                 }
 
-            // Lógica 2: Clique na lista de pagamentos pendentes (DO MODAL ANTIGO OU DO NOVO FILTRO)
+            // Lógica 2: Clique na lista de pagamentos pendentes...
             } else if (currentEntityType === 'pending-payments-view' || currentEntityType === 'pending-payments-filter-view') { // <-- MUDANÇA FEITA AQUI
                 const item = e.target.closest('.event-item');
                 if (item) {
