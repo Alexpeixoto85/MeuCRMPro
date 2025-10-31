@@ -352,83 +352,80 @@
         /* ===== FIM: ESTILOS DA AGENDA-CALENDÁRIO ===== */
         
         /* ===== INÍCIO: ESTILOS PARA DOCUMENTOS PDF ===== */
-        #pdf-generator {
-            position: absolute; left: -9999px; top: -9999px;
-            width: 210mm;
-            background: white;
-            color: #333;
-        }
-        .pdf-document-container {
-            font-family: 'Roboto', sans-serif;
-            font-size: 11pt;
-            line-height: 1.5;
-            padding: 15mm;
-        }
-        .pdf-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #D4AF37;
-            padding-bottom: 8mm;
-            margin-bottom: 10mm;
-        }
-        .pdf-header-logo {
-            max-width: 50mm;
-            max-height: 25mm;
-            object-fit: contain;
-        }
-        .pdf-header-info {
-            text-align: right;
-            font-size: 9pt;
-        }
-        .pdf-header-info h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14pt;
-            color: #2C3E50;
-            margin: 0 0 5px 0;
-        }
-        .pdf-content h1, .pdf-content h2, .pdf-content h3 {
-            font-family: 'Montserrat', sans-serif;
-            color: #2C3E50;
-            margin-top: 8mm;
-            margin-bottom: 5mm;
-            padding-bottom: 2mm;
-            border-bottom: 1px solid #eee;
-        }
-        .pdf-content h1 { font-size: 16pt; text-align: center; }
-        .pdf-content h2 { font-size: 13pt; }
-        .pdf-content h3 { font-size: 12pt; margin-top: 6mm; margin-bottom: 3mm; border-bottom: none; }
-        .pdf-content p { text-align: justify; margin-bottom: 4mm; }
-        .pdf-signatures { margin-top: 20mm; }
-        .pdf-signature-line {
-            margin-top: 20mm;
-            border-top: 1px solid #555;
-            width: 70%;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-            padding-top: 2mm;
-            font-size: 10pt;
-        }
-        .pdf-centered-text { text-align: center; }
-        .receipt-value-box {
-            background-color: #f4f6f9;
-            border: 1px solid #ddd;
-            padding: 10mm;
-            margin: 8mm 0;
-            text-align: center;
-        }
-        .receipt-value-box .value {
-            font-size: 18pt;
-            font-weight: 700;
-            color: #2C3E50;
-        }
-        .receipt-value-box .value-in-words {
-            font-size: 10pt;
-            margin-top: 3mm;
-            font-style: italic;
-        }
-         /* ===== FIM: NOVOS ESTILOS PARA DOCUMENTOS PDF ===== */
+#pdf-generator {
+    position: absolute; left: -9999px; top: -9999px;
+    width: 210mm;
+    background: white;
+    color: #333;
+}
+.pdf-document-container {
+    font-family: 'Roboto', sans-serif;
+    font-size: 10pt; /* Reduzido de 11pt para caber mais texto */
+    line-height: 1.3; /* Reduzido de 1.5 para aproximar as linhas */
+    padding: 10mm; /* Margens reduzidas (era 15mm) */
+}
+.pdf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #D4AF37;
+    padding-bottom: 5mm; /* Espaçamento reduzido (era 8mm) */
+    margin-bottom: 7mm; /* Espaçamento reduzido (era 10mm) */
+}
+.pdf-header-logo {
+    max-width: 40mm; /* Logo reduzida (era 50mm) */
+    max-height: 20mm; /* Logo reduzida (era 25mm) */
+    object-fit: contain;
+}
+.pdf-header-info {
+    text-align: right;
+    font-size: 9pt;
+}
+.pdf-header-info h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14pt;
+    color: #2C3E50;
+    margin: 0 0 5px 0;
+}
+.pdf-content h1, .pdf-content h2, .pdf-content h3 {
+    font-family: 'Montserrat', sans-serif;
+    color: #2C3E50;
+    margin-top: 6mm; /* Espaçamento reduzido (era 8mm) */
+    margin-bottom: 3mm; /* Espaçamento reduzido (era 5mm) */
+    padding-bottom: 2mm;
+    border-bottom: 1px solid #eee;
+}
+.pdf-content h1 { font-size: 14pt; text-align: center; } /* Fonte reduzida (era 16pt) */
+.pdf-content h2 { font-size: 12pt; } /* Fonte reduzida (era 13pt) */
+.pdf-content h3 { font-size: 11pt; margin-top: 5mm; margin-bottom: 2mm; border-bottom: none; } /* Espaçamento reduzido */
+.pdf-content p { text-align: justify; margin-bottom: 2mm; } /* Espaçamento reduzido (era 4mm) */
+.pdf-signatures { margin-top: 10mm; } /* Espaçamento reduzido (era 20mm) */
+.pdf-signature-line {
+    margin-top: 15mm; /* Espaçamento reduzido (era 20mm) */
+    border-top: 1px solid #555;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-top: 2mm;
+    font-size: 10pt;
+}
+.pdf-centered-text { text-align: center; }
+.receipt-value-box {
+    background-color: #f4f6f9;
+    border: 1px solid #ddd;
+    padding: 8mm; /* Reduzido de 10mm */
+    margin: 6mm 0; /* Reduzido de 8mm */
+    text-align: center;
+}
+.receipt-value-box .value {
+    font-size: 16pt; /* Reduzido de 18pt */
+}
+.receipt-value-box .value-in-words {
+    font-size: 10pt;
+    margin-top: 2mm; /* Reduzido de 3mm */
+}
+ /* ===== FIM: NOVOS ESTILOS PARA DOCUMENTOS PDF ===== */
 
         /* ===== INÍCIO: NOVO TEMPLATE DE PORTFÓLIO ===== */
         .portfolio-page-v2 {
@@ -1761,6 +1758,32 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="client-lead-source">Origem do Lead</label><select id="client-lead-source"><option value="">Selecione...</option>${sourceOptions}</select></div>
                     <div class="form-group full-width"><label for="client-propertyId">Imóvel de Interesse</label><select id="client-propertyId"><option value="">Nenhum</option>${propertyOptions}</select></div>
                     <div class="form-group full-width"><label for="client-notes">Observações</label><textarea id="client-notes">${client.notes || ''}</textarea></div>
+<div class="form-group full-width" style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+    <label style="font-size: 1.1rem; color: var(--secondary-color); margin-bottom: 1rem; display: block;">Dados do Cônjuge (Opcional)</label>
+
+    <div class="form-grid" style="grid-template-columns: 1fr 1fr;"> <div class="form-group">
+            <label for="spouse-name">Nome do Cônjuge</label>
+            <input type="text" id="spouse-name" value="${client.spouseName || ''}">
+        </div>
+        <div class="form-group">
+            <label for="spouse-cpf">CPF do Cônjuge</label>
+            <input type="text" id="spouse-cpf" value="${client.spouseCpf || ''}">
+        </div>
+        <div class="form-group">
+            <label for="spouse-birthdate">Data de Nasc. Cônjuge</label>
+            <input type="date" id="spouse-birthdate" value="${client.spouseBirthdate || ''}">
+        </div>
+        <div class="form-group">
+            <label for="spouse-income">Renda do Cônjuge (R$)</label>
+            <input type="number" id="spouse-income" value="${client.spouseIncome || ''}">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; grid-column: 1 / -1;">
+            <input type="checkbox" id="client-spouse-composes-income" ${client.spouseComposesIncome ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
+            <label for="client-spouse-composes-income" style="margin-bottom: 0; margin-top: 10px;">Cônjuge compõe renda para simulação?</label>
+        </div>
+    </div>
+</div>
                 </div>
             `;
         };
@@ -2684,25 +2707,46 @@ const getStaleClientsForArchiving = () => {
             // USA VALOR DE AVALIAÇÃO (ou tabela se avaliação for 0 ou não existir)
             const propertyPrice = (property.evalPrice && property.evalPrice > 0) ? property.evalPrice : property.listPrice;
 
-            if (!client || !property || !client.income || !client.birthdate || !propertyPrice) {
+            if (!client || !property || !client.birthdate || !propertyPrice) {
                 return { error: 'Dados insuficientes. Verifique se o cliente possui renda, data de nascimento e um imóvel de interesse com valor de avaliação (ou tabela) cadastrado.' };
             }
 
             const clientAgeInMonths = getAgeInMonths(client.birthdate);
+// --- INÍCIO DA MODIFICAÇÃO DE RENDA ---
+// Calcula a renda total com base na seleção
+let totalIncome = client.income || 0;
+let incomeReason = `Renda Titular: ${formatCurrency(totalIncome)}`;
+
+if (client.spouseComposesIncome && client.spouseIncome > 0) {
+    totalIncome += client.spouseIncome;
+    incomeReason += ` + Renda Cônjuge: ${formatCurrency(client.spouseIncome)}`;
+}
+
+// Validação de renda (movida para cá)
+if (totalIncome <= 0) {
+     return { error: 'Dados insuficientes. A renda total (titular ou + cônjuge) deve ser maior que zero para a simulação.' };
+}
+// --- FIM DA MODIFICAÇÃO DE RENDA ---
             if (clientAgeInMonths === null) {
                 return { error: 'Data de nascimento do cliente é inválida.' };
             }
 
-            // 2. Define as taxas de juros (COM A NOVA LÓGICA)
+            // 2. Define as taxas de juros (COM A NOVA LÓGICA DE FAIXAS)
             let INTEREST_RATE_YEARLY;
-            let rateReason = ''; // (NOVO) Variável para explicar a taxa no relatório
+            let rateReason = ''; // Variável para explicar a taxa no relatório
 
-            if (client.income && client.income <= 4700) {
-                // REGRA 1: Renda até R$ 4.700 (Sua nova regra)
-                INTEREST_RATE_YEARLY = 0.066972; // Taxa Efetiva de 6.6972%
+            if (totalIncome && totalIncome <= 4000) {
+                // REGRA 1 (NOVA): Renda até R$ 4.000
+                INTEREST_RATE_YEARLY = 0.056408; // Taxa Efetiva de 5.6408% (Nominal 5.5%)
+                rateReason = 'Renda <= R$ 4.000 (Taxa 5,5% Nominal)';
+            
+            } else if (client.income && client.income <= 4700) {
+                // REGRA 2 (AJUSTADA): Renda entre R$ 4.000,01 e R$ 4.700
+                INTEREST_RATE_YEARLY = 0.066972; // Taxa Efetiva de 6.6972% (Nominal 6.5%)
                 rateReason = 'Renda <= R$ 4.700 (Taxa 6,5% Nominal)';
+            
             } else {
-                // REGRA 2: Renda acima de R$ 4.700 (lógica antiga)
+                // REGRA 3: Renda acima de R$ 4.700 (lógica antiga)
                 if (client.hasFormalWork) {
                     // Com 3+ anos de carteira: 7.9348%
                     INTEREST_RATE_YEARLY = 0.079348;
@@ -2732,7 +2776,7 @@ const getStaleClientsForArchiving = () => {
 
             // 6. Cálculos de financiamento
             const maxLoanFromBank = propertyPrice * MAX_LOAN_TO_VALUE;
-            const maxAffordablePayment = client.income * MAX_DEBT_TO_INCOME;
+            const maxAffordablePayment = totalIncome * MAX_DEBT_TO_INCOME;
             const requiredPaymentForMaxLoan = (maxLoanFromBank * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
 
             const isCompatible = requiredPaymentForMaxLoan <= maxAffordablePayment;
@@ -2748,14 +2792,15 @@ const getStaleClientsForArchiving = () => {
 
             // 7. Retorna os resultados
             return {
-                isCompatible, clientIncome: client.income, 
-                propertyValue: propertyPrice, // Valor de Avaliação usado no cálculo
+    isCompatible, clientIncome: totalIncome, // Modificado
+    incomeReason: incomeReason, // Adicionado
+    propertyValue: propertyPrice, // Valor de Avaliação usado no cálculo
                 listPrice: property.listPrice, // Valor de Tabela para cálculo da entrada
                 maxAffordablePayment, requiredPaymentForMaxLoan, approvedLoanAmount, requiredDownPayment,
                 finalTerm: Math.floor(finalTerm), 
                 standardDownPayment: property.listPrice - (propertyPrice * MAX_LOAN_TO_VALUE),
                 rateUsed: INTEREST_RATE_YEARLY, // Informa a taxa que foi usada
-                rateReason: rateReason // (NOVO) Informa o motivo da taxa
+                rateReason: rateReason // Informa o motivo da taxa
             };
         };
 
@@ -2768,20 +2813,32 @@ const getStaleClientsForArchiving = () => {
         const resultText = analysis.isCompatible ? 'RENDA COMPATÍVEL' : 'RENDA INSUFICIENTE PARA FINANCIAMENTO DE 80%';
         const rateUsedPercent = (analysis.rateUsed * 100).toFixed(4); // Mostra a taxa exata
 
+        // Pega o novo motivo da análise
+        const reasonText = analysis.rateReason ? `(${analysis.rateReason})` : '';
+
         return `
             <div class="analysis-result">
                 <h4>Análise para <strong>${clientName}</strong> | Imóvel: <strong>${propertyName}</strong></h4><hr>
                 <p><strong>Valor de Tabela (Venda):</strong> ${formatCurrency(analysis.listPrice)}</p>
                 <p><strong>Valor de Avaliação (Base do Cálculo):</strong> ${formatCurrency(analysis.propertyValue)}</p>
                 <p><strong>Renda do Cliente:</strong> ${formatCurrency(analysis.clientIncome)}</p>
-                <p><strong>Taxa de Juros Efetiva (Anual):</strong> ${rateUsedPercent}% ${analysis.rateUsed > 0.08 ? '(Sem 3+ anos CA)' : '(Com 3+ anos CA)'}</p>
+                ${analysis.incomeReason ? `<p style="margin-top: -10px;"><small><strong>Composição:</strong> ${analysis.incomeReason}</small></p>` : ''}
+                
+                <p><strong>Taxa de Juros Efetiva (Anual):</strong> ${rateUsedPercent}% ${reasonText}</p>
+
                 <p><strong>Parcela Máxima Suportada (30%):</strong> ${formatCurrency(analysis.maxAffordablePayment)}</p>
                 <p><strong>Prazo Máximo de Financiamento:</strong> ${analysis.finalTerm} meses (${Math.floor(analysis.finalTerm / 12)} anos)</p><hr>
                 <h4>Resultado da Simulação</h4>
                 <p><strong>Parcela Estimada (para 80% da Avaliação):</strong> ${formatCurrency(analysis.requiredPaymentForMaxLoan)}</p>
+                
+                <p style="margin-top: 5px;"><small><strong>Atenção:</strong> O valor da parcela estimada não inclui o seguro Caixa (MIP/DFI), que varia conforme a apólice escolhida no momento da contratação.</small></p>
+
                 <p><strong>Resultado:</strong> <span class="${resultClass}">${resultText}</span></p><br>
                 <p><strong>Valor Máximo de Financiamento Aprovado:</strong> ${formatCurrency(analysis.approvedLoanAmount)}</p>
+                
                 <p><strong>ENTRADA (Diferença do Valor de Tabela):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
+                
+                <p style="margin-top: 5px;"><small><strong>Forma de Pagamento da Entrada:</strong> Esse valor pode ser abatido com o saldo do FGTS (caso tenha) e recursos próprios. Para tanto, é necessário elaborar um plano de pagamento compatível com sua realidade financeira e que esteja dentro dos parâmetros estipulados pela construtora.</small></p>
                 ${!analysis.isCompatible ? `<p><small>(A entrada padrão com base na avaliação seria de ${formatCurrency(analysis.standardDownPayment)})</small></p>` : ''}
             </div>
         `;
@@ -2832,7 +2889,16 @@ const getStaleClientsForArchiving = () => {
                             <p><strong>Imóvel:</strong> ${property.name}</p>
                             ${analysisContent}
                         </div>
-                    </div>
+                        
+                        <div class="pdf-footer" style="margin-top: 8mm; border-top: 1px solid #eee; padding-top: 5mm; text-align: center; font-size: 9pt; color: #555;">
+                        <p style="text-align: center; margin-bottom: 2mm;">
+                                Todos os cálculos são meramente ilustrativos e que podem sofrer alterações a qualquer momento.
+                            </p>
+                            <p style="text-align: center; margin-bottom: 0;">
+                                Pra efeitos de contratação deve-se considerar as informações fornecidas no momento da análise de crédito e assinatura do contrato com o banco.
+                            </p>
+                        </div>
+                        </div>
                 `;
                 
                 // Criamos um nome de arquivo
@@ -3585,6 +3651,19 @@ const openPendingPaymentsModal = () => {
             const commission = client.commission || db.settings.defaultCommission;
             const commissionValue = (propertyValue * commission) / 100;
             const events = db.events.filter(e => e.clientId == id);
+            // --- INÍCIO: HTML DO CÔNJUGE ---
+let spouseHtml = '';
+if (client.spouseName) {
+    spouseHtml = `
+        <h3>Dados do Cônjuge</h3>
+        <p><strong>Nome:</strong> ${client.spouseName}</p>
+        <p><strong>CPF:</strong> ${client.spouseCpf || 'Não informado'}</p>
+        <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
+        <p><strong>Renda:</strong> ${formatCurrency(client.spouseIncome)}</p>
+        <p><strong>Compõe Renda?</strong> ${client.spouseComposesIncome ? 'Sim' : 'Não'}</p>
+    `;
+}
+// --- FIM: HTML DO CÔNJUGE ---
             
             let financingHtml = '';
             if (property) {
@@ -3602,6 +3681,9 @@ const openPendingPaymentsModal = () => {
                 <p><strong>Contato:</strong> ${client.phone || ''}</p>
                 <p><strong>Email:</strong> ${client.email || ''}</p>
                 <p><strong>CPF:</strong> ${client.cpf || ''}</p>
+                <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
+
+                ${spouseHtml} <h3>Dados Financeiros e de Interesse</h3>
                 <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
                 
                 <h3>Dados Financeiros e de Interesse</h3>
@@ -4513,6 +4595,13 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
                     notes: document.getElementById('client-notes').value,
                     notes: document.getElementById('client-notes').value,
                     hasFormalWork: document.getElementById('client-formal-work').checked,
+                    // --- INÍCIO: SALVAR DADOS DO CÔNJUGE ---
+spouseName: document.getElementById('spouse-name').value,
+spouseCpf: document.getElementById('spouse-cpf').value,
+spouseBirthdate: document.getElementById('spouse-birthdate').value,
+spouseIncome: parseFloat(document.getElementById('spouse-income').value) || 0,
+spouseComposesIncome: document.getElementById('client-spouse-composes-income').checked,
+// --- FIM: SALVAR DADOS DO CÔNJUGE ---
                     // Manter dados existentes se estiver editando
                     lastContact: currentEditingId ? db.clients.find(c => c.id == currentEditingId).lastContact : null,
                     contactHistory: currentEditingId ? db.clients.find(c => c.id == currentEditingId).contactHistory : []
@@ -4525,6 +4614,21 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
                         const oldClient = db.clients[index];
                         const newStageId = clientData.stageId; // Agora 'clientData' existe
                         const oldStageId = oldClient.stageId;
+                        // **** INÍCIO: LÓGICA PARA ATUALIZAR HISTÓRICO AO MUDAR ETAPA ****
+if (newStageId !== oldStageId) {
+    // A etapa mudou, então atualizamos o 'lastContact'
+    clientData.lastContact = new Date().toISOString().slice(0, 10);
+
+    // Adicionamos um novo registro no histórico de contatos
+    if (!clientData.contactHistory) {
+        clientData.contactHistory = [];
+    }
+    clientData.contactHistory.push({
+        date: clientData.lastContact,
+        stageId: newStageId // Salva a NOVA etapa
+    });
+}
+// **** FIM DA NOVA LÓGICA ****
                         const vendaStage = db.funnelStages.find(s => s.name.toLowerCase() === 'venda');
                         const vendaStageId = vendaStage ? vendaStage.id : null;
 
@@ -4844,21 +4948,7 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
         <progress value="${leadsThisMonth}" max="${leadsGoal}" style="width: 100%; height: 20px;"></progress>
     </div>
 
-    <div class="dashboard-card">
-        <h3>Sugestão de Arquivamento</h3>
-        <p style="font-size: 0.9rem; opacity: 0.8;">Clientes com 3+ contatos sem evolução no funil.</p>
-        <ul style="max-height: 150px; overflow-y: auto;">
-            ${staleClients.length > 0 ? 
-                staleClients.map(client => `
-                    <li style="cursor: pointer; color: var(--danger-color);" 
-                        onclick="switchPanel('clients'); document.getElementById('client-search').value='${client.name}'; triggerClientTableRender();"
-                        title="Clique para localizar ${client.name}">
-                        <i class="fas fa-archive"></i> ${client.name}
-                    </li>`).join('') : 
-                '<li>Nenhum cliente estagnado.</li>'
-            }
-        </ul>
-    </div>
+    
     <div class="dashboard-card">
         <h3>Lançamentos Vencendo e Vencidos</h3>
         <ul>${financialAlertsHtml}</ul>
@@ -4870,7 +4960,20 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
         <div class="dashboard-card">
         <h3>Eventos de Amanhã</h3>
         <ul>${renderEventList(tomorrowEvents)}</ul>
-    </div>
+    </div><div class="dashboard-card">
+    <h3>Sugestão de Arquivamento</h3>
+    <p style="font-size: 0.9rem; opacity: 0.8;">Clientes com 3+ contatos sem evolução no funil.</p>
+    <ul style="max-height: 150px; overflow-y: auto;">
+        ${staleClients.length > 0 ? 
+            staleClients.map(client => `
+                <li class="stale-client-item" data-client-id="${client.id}" style="cursor: pointer; color: var(--danger-color);" 
+                    title="Clique para editar ${client.name}">
+                    <i class="fas fa-archive"></i> ${client.name}
+                </li>`).join('') : 
+            '<li>Nenhum cliente estagnado.</li>'
+        }
+    </ul>
+</div>
 `;
             
             renderFunnelChart();
@@ -4879,6 +4982,17 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
         document.getElementById('dashboard-content').addEventListener('click', e => {
             const eventItem = e.target.closest('.dashboard-event-item');
             if (eventItem) {
+                // (Cole este bloco dentro do 'dashboard-content'.addEventListener)
+
+        const staleClientItem = e.target.closest('.stale-client-item');
+        if (staleClientItem) {
+            const clientId = staleClientItem.dataset.clientId;
+            const client = db.clients.find(c => c.id == clientId);
+            if (client) {
+                openModal('Editar Cliente', getClientFormHtml(client), 'client', clientId);
+            }
+            return;
+        }
                 const eventId = eventItem.dataset.eventId;
                 const event = db.events.find(ev => ev.id == eventId);
                 if (event) {
