@@ -1461,22 +1461,37 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
                 alert("Ocorreu um erro crítico ao tentar salvar os dados. Suas alterações recentes podem não ter sido salvas.");
             }
         };
+const generatePaymentsArray = (record) => {
+    // ======================= INÍCIO DA ADIÇÃO =======================
+    // 1. Lemos o status temporário que foi salvo no Passo 2.
+    // Se ele não existir (por ex, em uma migração de dados antigos),
+    // o padrão continua sendo 'pending'.
+    const initialStatus = record._tempNewStatus || 'pending';
+    // ======================== FIM DA ADIÇÃO =========================
 
-        const generatePaymentsArray = (record) => {
-            const payments = [];
-            const startDate = new Date(record.startDate + 'T00:00:00');
-            const installments = record.recurrence === 'monthly' ? 1200 : (record.totalInstallments || 1); 
+    const payments = [];
+    const startDate = new Date(record.startDate + 'T00:00:00');
+    const installments = record.recurrence === 'monthly' ? 1200 : (record.totalInstallments || 1); 
 
-            for (let i = 0; i < installments; i++) {
-                const paymentDate = new Date(startDate);
-                paymentDate.setMonth(startDate.getMonth() + i);
-                payments.push({
-                    date: paymentDate.toISOString().slice(0, 10),
-                    status: 'pending'
-                });
-            }
-            return payments;
-        };
+    for (let i = 0; i < installments; i++) {
+        const paymentDate = new Date(startDate);
+        paymentDate.setMonth(startDate.getMonth() + i);
+        payments.push({
+            date: paymentDate.toISOString().slice(0, 10),
+            // ======================= MUDANÇA =========================
+            status: initialStatus // <-- 2. Usamos o status que lemos (paid ou pending)
+            // =========================================================
+        });
+    }
+
+    // ======================= INÍCIO DA ADIÇÃO =======================
+    // 3. Limpamos a propriedade temporária para que ela não seja
+    // salva acidentalmente no banco de dados.
+    delete record._tempNewStatus;
+    // ======================== FIM DA ADIÇÃO =========================
+
+    return payments;
+};
 
         const loadData = async () => {
             const oldData = localStorage.getItem('crmImobiliarioData');
@@ -2971,6 +2986,20 @@ const getStaleClientsForArchiving = () => {
                         <label for="fin-description">Descrição</label>
                         <input type="text" id="fin-description" value="${record.description || ''}" placeholder="${type === 'income' ? 'Ex: Comissão Venda Apto 101' : 'Ex: Parcela do carro'}">
                     </div>
+            <div class="form-group">
+                <label for="fin-installments">Nº de Parcelas</label>
+                <input type="number" id="fin-installments" value="${record.totalInstallments || 1}" min="1">
+            </div>
+
+            <div class="form-group" id="fin-status-group" style="display: ${record.id ? 'none' : 'block'};">
+                <label for="fin-status">Status do Lançamento</label>
+                <select id="fin-status">
+                    <option value="pending">Pendente (A pagar/receber)</option>
+                    <option value="paid">Consolidado (Pago/Recebido)</option>
+                </select>
+            </div>
+            </div>
+        ${paymentHtml}
                     <div class="form-group">
                         <label for="fin-value">Valor (R$)</label>
                         <input type="number" id="fin-value" value="${record.value || ''}">
@@ -4816,26 +4845,34 @@ if (newStageId !== oldStageId) {
                 generateDocumentPdf(receipt);
             }
              
-            if (currentEntityType === 'financialRecord') {
-                // AQUI ESTÁ A ÚNICA LINHA QUE VOCÊ PRECISA MUDAR
-                const isEditing = typeof currentEditingId === 'number';
+            // [CÓDIGO MODIFICADO - DEPOIS]
+        if (currentEntityType === 'financialRecord') {
+            const isEditing = typeof currentEditingId === 'number';
+            let existingRecord = isEditing ? db.financialRecords.find(r => r.id == currentEditingId) : {};
 
-                let existingRecord = isEditing ? db.financialRecords.find(r => r.id == currentEditingId) : {};
+            // ======================= INÍCIO DA ADIÇÃO =======================
+            // 1. Lemos o valor do novo campo <select>
+            // O '?' (optional chaining) é uma segurança: se o elemento não for encontrado
+            // (por ex, em modo de edição, onde ele está oculto), o valor será 'undefined'.
+            // O '|| 'pending'' garante que, se for undefined, o padrão será 'pending'.
+            const newStatus = document.getElementById('fin-status')?.value || 'pending';
+            // ======================== FIM DA ADIÇÃO =========================
 
-                const recordData = {
-                ...existingRecord,
-                id: isEditing ? currentEditingId : Date.now() + Math.random(),
-                description: document.getElementById('fin-description').value,
-                value: parseFloat(document.getElementById('fin-value').value) || 0,
-                category: document.getElementById('fin-category').value,
-                startDate: document.getElementById('fin-start-date').value,
-                recurrence: document.getElementById('fin-recurrence').value,
-                totalInstallments: parseInt(document.getElementById('fin-installments').value) || 1,
-                type: isEditing ? existingRecord.type : currentEditingId,
-                clientId: document.getElementById('fin-client-id').value || null, // ADICIONE ESTA LINHA
-            };
-                
-                const needsPaymentUpdate = !isEditing || 
+            const recordData = {
+            ...existingRecord,
+            id: isEditing ? currentEditingId : Date.now() + Math.random(),
+            description: document.getElementById('fin-description').value,
+            value: parseFloat(document.getElementById('fin-value').value) || 0,
+            category: document.getElementById('fin-category').value,
+            startDate: document.getElementById('fin-start-date').value,
+            recurrence: document.getElementById('fin-recurrence').value,
+            totalInstallments: parseInt(document.getElementById('fin-installments').value) || 1,
+            type: isEditing ? existingRecord.type : currentEditingId,
+            clientId: document.getElementById('fin-client-id').value || null,
+            _tempNewStatus: newStatus // <-- 2. Armazenamos o status lido em uma propriedade temporária
+        };
+
+            const needsPaymentUpdate = !isEditing ||
                                            recordData.startDate !== existingRecord.startDate ||
                                            recordData.totalInstallments !== existingRecord.totalInstallments ||
                                            recordData.recurrence !== existingRecord.recurrence;
