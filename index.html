@@ -4042,7 +4042,7 @@ if (propertyIds.length === 1) {
     const prop = db.properties.find(p => p.id == propertyIds[0]);
     if (prop && prop.name) {
         // Limpa o nome para que seja seguro para um arquivo (remove caracteres inválidos e substitui espaços por '_')
-        const safeName = prop.name.replace(/[^a-z0-9_ -]/gi, '').trim().replace(/\s+/g, '_');
+        const safeName = prop.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_ -]/gi, '').trim().replace(/\s+/g, '_');
         fileName = `Portfolio_${safeName}.pdf`;
     } else {
         // Fallback (caso não ache o nome)
