@@ -2978,40 +2978,31 @@ const getStaleClientsForArchiving = () => {
                 `;
             }
 
-            return `
-                ${getFinancialRecordFormHtml.content = /*html*/`
+            // AQUI ESTÁ A ESTRUTURA CORRIGIDA:
+            return /*html*/`
                 <div class="form-grid">
-                <input type="hidden" id="fin-client-id" value="${record.clientId || associatedClientId || ''}">
+                    <input type="hidden" id="fin-client-id" value="${record.clientId || associatedClientId || ''}">
+                    
                     <div class="form-group full-width">
                         <label for="fin-description">Descrição</label>
                         <input type="text" id="fin-description" value="${record.description || ''}" placeholder="${type === 'income' ? 'Ex: Comissão Venda Apto 101' : 'Ex: Parcela do carro'}">
                     </div>
-            <div class="form-group">
-                <label for="fin-installments">Nº de Parcelas</label>
-                <input type="number" id="fin-installments" value="${record.totalInstallments || 1}" min="1">
-            </div>
 
-            <div class="form-group" id="fin-status-group" style="display: ${record.id ? 'none' : 'block'};">
-                <label for="fin-status">Status do Lançamento</label>
-                <select id="fin-status">
-                    <option value="pending">Pendente (A pagar/receber)</option>
-                    <option value="paid">Consolidado (Pago/Recebido)</option>
-                </select>
-            </div>
-            </div>
-        ${paymentHtml}
                     <div class="form-group">
                         <label for="fin-value">Valor (R$)</label>
                         <input type="number" id="fin-value" value="${record.value || ''}">
                     </div>
+
                     <div class="form-group">
                         <label for="fin-category">Categoria</label>
                         <input type="text" id="fin-category" value="${record.category || ''}" placeholder="${type === 'income' ? 'Comissão, Aluguel...' : 'Marketing, Transporte...'}">
                     </div>
+
                     <div class="form-group">
                         <label for="fin-start-date">Data de Início / Vencimento</label>
                         <input type="date" id="fin-start-date" value="${record.startDate || new Date().toISOString().slice(0, 10)}">
                     </div>
+
                     <div class="form-group">
                         <label for="fin-recurrence">Tipo de Lançamento</label>
                         <select id="fin-recurrence">
@@ -3019,13 +3010,22 @@ const getStaleClientsForArchiving = () => {
                             <option value="monthly" ${record.recurrence === 'monthly' ? 'selected' : ''}>Recorrente Mensal</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label for="fin-installments">Nº de Parcelas</label>
                         <input type="number" id="fin-installments" value="${record.totalInstallments || 1}" min="1">
                     </div>
+                    
+                    <div class="form-group" id="fin-status-group" style="display: ${record.id ? 'none' : 'block'};">
+                        <label for="fin-status">Status do Lançamento</label>
+                        <select id="fin-status">
+                            <option value="pending">Pendente (A pagar/receber)</option>
+                            <option value="paid">Consolidado (Pago/Recebido)</option>
+                        </select>
+                    </div>
                 </div>
+
                 ${paymentHtml}
-                `}
             `;
         };
 
