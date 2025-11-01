@@ -2750,18 +2750,14 @@ if (totalIncome <= 0) {
                 return { error: 'Data de nascimento do cliente é inválida.' };
             }
 
-            // 2. Define as taxas de juros (COM A NOVA LÓGICA DE FAIXAS)
-            let INTEREST_RATE_YEARLY;
-            let rateReason = ''; // Variável para explicar a taxa no relatório
-
             if (totalIncome && totalIncome <= 4000) {
                 // REGRA 1 (NOVA): Renda até R$ 4.000
-                INTEREST_RATE_YEARLY = 0.056408; // Taxa Efetiva de 5.6408% (Nominal 5.5%)
+                INTEREST_RATE_YEARLY = 0.056408; 
                 rateReason = 'Renda <= R$ 4.000 (Taxa 5,5% Nominal)';
             
-            } else if (client.income && client.income <= 4700) {
+            } else if (totalIncome && totalIncome <= 4700) { // <--- LINHA NOVA (CORRIGIDA)
                 // REGRA 2 (AJUSTADA): Renda entre R$ 4.000,01 e R$ 4.700
-                INTEREST_RATE_YEARLY = 0.066972; // Taxa Efetiva de 6.6972% (Nominal 6.5%)
+                INTEREST_RATE_YEARLY = 0.066972; 
                 rateReason = 'Renda <= R$ 4.700 (Taxa 6,5% Nominal)';
             
             } else {
@@ -2783,11 +2779,39 @@ if (totalIncome <= 0) {
             const MAX_LOAN_TO_VALUE = 0.80; // 80%
             const MAX_DEBT_TO_INCOME = 0.30; // 30%
 
-            // 4. Cálculo do prazo (como antes)
-            const maxTermByAge = MAX_AGE_MONTHS - clientAgeInMonths;
-            if (maxTermByAge <= 0) {
-                return { error: 'Cliente acima da idade máxima para financiamento.' };
+            // 4. Cálculo do prazo (NOVA LÓGICA DE IDADE - O MAIS VELHO)
+            
+            // Começa assumindo a idade do cliente principal
+            let oldestAgeInMonths = clientAgeInMonths;
+
+            // Agora, verifica duas condições:
+            // 1. O cônjuge está sendo usado para compor renda? (client.spouseComposesIncome)
+            // 2. O cônjuge tem uma data de nascimento cadastrada? (client.spouseBirthdate)
+            if (client.spouseComposesIncome && client.spouseBirthdate) {
+                
+                // Se sim, calcula a idade do cônjuge
+                const spouseAgeInMonths = getAgeInMonths(client.spouseBirthdate);
+                
+                // Se a data de nascimento do cônjuge for válida...
+                if (spouseAgeInMonths !== null) {
+                    // Usa a função Math.max() para pegar o valor MAIOR (ou seja, a pessoa mais velha)
+                    oldestAgeInMonths = Math.max(clientAgeInMonths, spouseAgeInMonths);
+                }
             }
+
+            // O restante do cálculo agora usa a 'oldestAgeInMonths' (idade do mais velho)
+            const maxTermByAge = MAX_AGE_MONTHS - oldestAgeInMonths;
+            
+            if (maxTermByAge <= 0) {
+                // Mensagem de erro personalizada caso o mais velho (seja cliente ou cônjuge) estoure a idade
+                if (oldestAgeInMonths === clientAgeInMonths) {
+                    return { error: 'Cliente (proponente mais velho) está acima da idade máxima para financiamento (80 anos e 6 meses).' };
+                } else {
+                    return { error: 'Cônjuge (proponente mais velho) está acima da idade máxima para financiamento (80 anos e 6 meses).' };
+                }
+            }
+            
+            // O prazo final continua sendo o menor valor entre o prazo máximo (420) e o prazo restante pela idade
             const finalTerm = Math.min(MAX_TERM_MONTHS, maxTermByAge);
 
             // 5. Cálculo da taxa MENSAL (baseada na taxa ANUAL que definimos)
