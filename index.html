@@ -2957,6 +2957,8 @@ const getStaleClientsForArchiving = () => {
             };
         };
 
+        // Substitua sua função 'getFinancingAnalysisHtml' inteira por esta:
+
         const getFinancingAnalysisHtml = (analysis, clientName, propertyName) => {
          if (analysis.error) {
             return `<div class="analysis-result"><p class="highlight-danger">${analysis.error}</p></div>`;
@@ -2970,6 +2972,19 @@ const getStaleClientsForArchiving = () => {
         const reasonText = analysis.rateReason ? `(${analysis.rateReason})` : '';
         // Pega a nova composição da renda
         const incomeComposition = analysis.incomeReason ? `<p style="margin-top: -10px;"><small><strong>Composição:</strong> ${analysis.incomeReason}</small></p>` : '';
+
+
+        /* ================================================================
+        INÍCIO DA MODIFICAÇÃO (PASSO 5)
+        ================================================================
+        */
+        // Define o HTML do subsídio. Se for 0, mostra uma mensagem simples.
+        const subsidyHtml = analysis.subsidyAmount > 0 
+            ? `<p><strong>Subsídio Estimado (MCMV/Etc.):</strong> <strong style="color: var(--success-color);">${formatCurrency(analysis.subsidyAmount)}</strong></p>`
+            : '<p><small>Subsídio não aplicável ou não calculado.</small></p>';
+        /* ================================================================
+        FIM DA MODIFICAÇÃO
+        ================================================================ */
 
 
         return `
@@ -2992,8 +3007,7 @@ const getStaleClientsForArchiving = () => {
                 <p><strong>Resultado:</strong> <span class="${resultClass}">${resultText}</span></p><br>
                 <p><strong>Valor Máximo de Financiamento Aprovado:</strong> ${formatCurrency(analysis.approvedLoanAmount)}</p>
                 
-                <p><strong>ENTRADA (Diferença do Valor de Tabela):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
-                
+                ${subsidyHtml} <p><strong>ENTRADA (Valor Tabela - Financiamento - Subsídio):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
                 <p style="margin-top: 5px;"><small><strong>Forma de Pagamento da Entrada:</strong> Esse valor pode ser abatido com o saldo do FGTS (caso tenha) e recursos próprios. Para tanto, é necessário elaborar um plano de pagamento compatível com sua realidade financeira e que esteja dentro dos parâmetros estipulados pela construtora.</small></p>
                 ${!analysis.isCompatible ? `<p><small>(A entrada padrão com base na avaliação seria de ${formatCurrency(analysis.standardDownPayment)})</small></p>` : ''}
             </div>
