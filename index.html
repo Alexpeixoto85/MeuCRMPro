@@ -4777,6 +4777,13 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
         modalSaveBtn.addEventListener('click', async () => {
             // [INÍCIO DO CÓDIGO DE CORREÇÃO]
             if (currentEntityType === 'client') {
+if (currentEntityType === 'client') {
+    // [INÍCIO DA CORREÇÃO]
+    // 1. Busca o cliente *antes* de criar o objeto, para evitar erros
+    const existingClient = currentEditingId ? db.clients.find(c => c.id == currentEditingId) : null;
+    // [FIM DA CORREÇÃO]
+
+    // 1. LER OS DADOS DO FORMULÁRIO (Esta era a parte que faltava)
                 // 1. LER OS DADOS DO FORMULÁRIO (Esta era a parte que faltava)
                 const clientData = {
                     id: currentEditingId || Date.now() + Math.random(),
@@ -4817,13 +4824,14 @@ spouseIncome: parseFloat(document.getElementById('spouse-income').value) || 0,
 spouseComposesIncome: document.getElementById('client-spouse-composes-income').checked,
 // --- FIM: SALVAR DADOS DO CÔNJUGE ---
                     // Manter dados existentes se estiver editando
-                    lastContact: currentEditingId ? db.clients.find(c => c.id == currentEditingId).lastContact : null,
-                    contactHistory: currentEditingId ? db.clients.find(c => c.id == currentEditingId).contactHistory : []
-                };
+        lastContact: existingClient ? existingClient.lastContact : null,
+        contactHistory: existingClient ? existingClient.contactHistory : []
+    };
 
                 // 2. LÓGICA PARA EDITAR (currentEditingId existe)
                 if(currentEditingId) {
-                    const index = db.clients.findIndex(c => c.id == currentEditingId);
+                    if(currentEditingId) {
+        const index = existingClient ? db.clients.indexOf(existingClient) : -1;
                     if (index > -1) {
                         const oldClient = db.clients[index];
                         const newStageId = clientData.stageId; // Agora 'clientData' existe
