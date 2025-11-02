@@ -1765,16 +1765,6 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="client-income">Renda (R$)</label><input type="number" id="client-income" value="${client.income || ''}"></div>
                 <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
                     <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                   <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
-                    <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                    <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
-                </div>
-
-                <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
-                    <input type="checkbox" id="client-has-property" ${client.alreadyOwnsProperty ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                    <label for="client-has-property" style="margin-bottom: 0; margin-top: 10px;">Já possui imóvel no nome?</label>
-                </div>
-                <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
                     <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
                 </div>
                     <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
@@ -2745,63 +2735,8 @@ const getStaleClientsForArchiving = () => {
             const requiredIncome = pmt / 0.30;
             return requiredIncome;
         };
-             
-        /* ================================================================
-        PASSO 3.2 - COLE ESTA NOVA FUNÇÃO INTEIRA AQUI
-        ================================================================
-        */
-        const calculateSubsidy = (client) => {
-            // 1. Regra básica (conforme sua solicitação)
-            if (client.alreadyOwnsProperty) {
-                console.log("Cálculo de Subsídio: Cliente já possui imóvel. Subsídio = 0.");
-                return 0; // Não tem direito se já possui imóvel
-            }
 
-            // 2. Coleta de dados do cliente
-            const income = client.income || 0;
-            const birthdate = client.birthdate;
-            
-            // Se não tiver data de nascimento, não podemos calcular
-            if (!birthdate) {
-                console.log("Cálculo de Subsídio: Cliente sem data de nascimento. Subsídio = 0.");
-                return 0;
-            }
-
-            const ageInYears = getAgeInMonths(birthdate) / 12;
-            const hasFormalWork = client.hasFormalWork;
-            
-            // OBS: Faltam dados cruciais: Cidade/Estado (Maceió?), se tem dependentes, saldo FGTS.
-
-            // =================================================================
-            // !! AVISO IMPORTANTE !! 
-            // A LÓGICA ABAIXO É APENAS UM EXEMPLO BASEADO NO QUE VOCÊ DISSE.
-            // A FÓRMULA REAL É EXTREMAMENTE COMPLEXA.
-            // VOCÊ DEVE SUBSTITUIR ESTA LÓGICA PELAS REGRAS REAIS DA CAIXA.
-            // =================================================================
-
-            // Usando os exemplos que você forneceu (nascido em 1990 -> 35 anos em 2025):
-            // Vamos considerar uma faixa de idade, ex: entre 35 e 36 anos.
-            if (income === 2000 && ageInYears >= 35 && ageInYears < 36) { 
-                if (hasFormalWork) {
-                    console.log("Cálculo de Subsídio: R$2000, 35 anos, com carteira. Subsídio = 10032.00");
-                    return 10032.00;
-                } else {
-                    console.log("Cálculo de Subsídio: R$2000, 35 anos, sem carteira. Subsídio = 10215.00");
-                    return 10215.00;
-                }
-            }
-            
-            // Exemplo de outra faixa de renda (fictícia)
-            if (income > 2000 && income <= 2600) {
-                 // return 8000.00; // (Lógica de exemplo)
-            }
-            
-            // Retorna 0 (nenhum subsídio) se nenhuma regra for atendida
-            console.log("Cálculo de Subsídio: Nenhuma regra atendida. Subsídio = 0.");
-            return 0; 
-        };
-        
-            const calculateFinancing = (client, property) => {
+        const calculateFinancing = (client, property) => {
             // 1. Validação de dados de entrada
             // USA VALOR DE AVALIAÇÃO (ou tabela se avaliação for 0 ou não existir)
             const propertyPrice = (property.evalPrice && property.evalPrice > 0) ? property.evalPrice : property.listPrice;
@@ -2809,25 +2744,7 @@ const getStaleClientsForArchiving = () => {
             if (!client || !property || !propertyPrice) {
                 return { error: 'Dados insuficientes. Verifique se o cliente possui um imóvel de interesse com valor de avaliação (ou tabela) cadastrado.' };
             }
-
-            /* ================================================================
-            INÍCIO DA MODIFICAÇÃO (PASSO 4)
-            ================================================================
-            */
             
-            // 2. CALCULAR O SUBSÍDIO PRIMEIRO
-            // Usamos a nova função que criamos no Passo 3.2
-            const subsidyAmount = calculateSubsidy(client);
-            
-            // 3. Regra de Elegibilidade (Não pode ter imóvel)
-            if (client.alreadyOwnsProperty && subsidyAmount > 0) {
-                 return { error: 'Cliente já possui imóvel. Não é elegível para programas de subsídio.' };
-            }
-            /* ================================================================
-            FIM DA MODIFICAÇÃO
-            ================================================================ */
-
-
             // --- INÍCIO DA MODIFICAÇÃO DE RENDA E IDADE ---
             let totalIncome = client.income || 0;
             let incomeReason = `Renda Titular: ${formatCurrency(totalIncome)}`;
@@ -2918,24 +2835,10 @@ const getStaleClientsForArchiving = () => {
 
             if (isCompatible) {
                 approvedLoanAmount = maxLoanFromBank;
-                
-                /* ================================================================
-                   MODIFICAÇÃO AQUI: Subtrai o subsídio da entrada
-                   ================================================================ */
-                requiredDownPayment = property.listPrice - approvedLoanAmount - subsidyAmount;
-                
+                requiredDownPayment = property.listPrice - approvedLoanAmount;
             } else {
                 approvedLoanAmount = (maxAffordablePayment / monthlyInterestRate) * (1 - Math.pow(1 + monthlyInterestRate, -finalTerm));
-                
-                /* ================================================================
-                   MODIFICAÇÃO AQUI: Subtrai o subsídio da entrada
-                   ================================================================ */
-                requiredDownPayment = property.listPrice - approvedLoanAmount - subsidyAmount;
-            }
-            
-            // Garante que a entrada não seja negativa se o subsídio for muito alto
-            if (requiredDownPayment < 0) {
-                requiredDownPayment = 0;
+                requiredDownPayment = property.listPrice - approvedLoanAmount;
             }
 
             // 7. Retorna os resultados
@@ -2948,16 +2851,9 @@ const getStaleClientsForArchiving = () => {
                 finalTerm: Math.floor(finalTerm), 
                 standardDownPayment: property.listPrice - (propertyPrice * MAX_LOAN_TO_VALUE),
                 rateUsed: INTEREST_RATE_YEARLY, // Adicionado
-                rateReason: rateReason, // Adicionado
-                
-                /* ================================================================
-                   LINHA ADICIONADA AQUI: Passa o valor do subsídio para o resultado
-                   ================================================================ */
-                subsidyAmount: subsidyAmount 
+                rateReason: rateReason // Adicionado
             };
         };
-
-        // Substitua sua função 'getFinancingAnalysisHtml' inteira por esta:
 
         const getFinancingAnalysisHtml = (analysis, clientName, propertyName) => {
          if (analysis.error) {
@@ -2972,19 +2868,6 @@ const getStaleClientsForArchiving = () => {
         const reasonText = analysis.rateReason ? `(${analysis.rateReason})` : '';
         // Pega a nova composição da renda
         const incomeComposition = analysis.incomeReason ? `<p style="margin-top: -10px;"><small><strong>Composição:</strong> ${analysis.incomeReason}</small></p>` : '';
-
-
-        /* ================================================================
-        INÍCIO DA MODIFICAÇÃO (PASSO 5)
-        ================================================================
-        */
-        // Define o HTML do subsídio. Se for 0, mostra uma mensagem simples.
-        const subsidyHtml = analysis.subsidyAmount > 0 
-            ? `<p><strong>Subsídio Estimado (MCMV/Etc.):</strong> <strong style="color: var(--success-color);">${formatCurrency(analysis.subsidyAmount)}</strong></p>`
-            : '<p><small>Subsídio não aplicável ou não calculado.</small></p>';
-        /* ================================================================
-        FIM DA MODIFICAÇÃO
-        ================================================================ */
 
 
         return `
@@ -3007,7 +2890,8 @@ const getStaleClientsForArchiving = () => {
                 <p><strong>Resultado:</strong> <span class="${resultClass}">${resultText}</span></p><br>
                 <p><strong>Valor Máximo de Financiamento Aprovado:</strong> ${formatCurrency(analysis.approvedLoanAmount)}</p>
                 
-                ${subsidyHtml} <p><strong>ENTRADA (Valor Tabela - Financiamento - Subsídio):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
+                <p><strong>ENTRADA (Diferença do Valor de Tabela):</strong> <strong class="${resultClass}">${formatCurrency(analysis.requiredDownPayment)}</strong></p>
+                
                 <p style="margin-top: 5px;"><small><strong>Forma de Pagamento da Entrada:</strong> Esse valor pode ser abatido com o saldo do FGTS (caso tenha) e recursos próprios. Para tanto, é necessário elaborar um plano de pagamento compatível com sua realidade financeira e que esteja dentro dos parâmetros estipulados pela construtora.</small></p>
                 ${!analysis.isCompatible ? `<p><small>(A entrada padrão com base na avaliação seria de ${formatCurrency(analysis.standardDownPayment)})</small></p>` : ''}
             </div>
@@ -4777,15 +4661,8 @@ pdf.save(fileName); // <-- Esta linha agora usa o nome dinâmico
                     leadSource: document.getElementById('client-lead-source').value,
                     propertyId: document.getElementById('client-propertyId').value,
                     notes: document.getElementById('client-notes').value,
-                    // (Note: Havia uma linha 'notes:' duplicada aqui, eu removi.)
+                    notes: document.getElementById('client-notes').value,
                     hasFormalWork: document.getElementById('client-formal-work').checked,
-
-                    // ================================================================
-                    // LINHA ADICIONADA AQUI (PASSO 3.1)
-                    // ================================================================
-                    alreadyOwnsProperty: document.getElementById('client-has-property').checked,
-                    // ================================================================
-
                     // --- INÍCIO: SALVAR DADOS DO CÔNJUGE ---
 spouseName: document.getElementById('spouse-name').value,
 spouseCpf: document.getElementById('spouse-cpf').value,
