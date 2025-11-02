@@ -444,7 +444,7 @@
     align-items: center; /* Centraliza verticalmente */
     padding: 4mm 8mm; /* Adiciona um espaço interno */
     border: 2px solid var(--secondary-color);
-    background-color: transparent; /* ADICIONA A FAIXA AZUL */
+    background-color: var(--secondary-color); /* ADICIONA A FAIXA AZUL */
 }
         .portfolio-v2-broker-info { 
             text-align: center; /* Centraliza o texto */
@@ -459,7 +459,7 @@
         .portfolio-v2-broker-info p {
     font-size: 9pt;
     margin: 2px 0 0 0;
-    color: var(--secondary-color); /* Cor Branca */
+    color: var(--text-light-color); /* Cor Branca */
 }
         .portfolio-v2-logo {
             max-height: 15mm;
@@ -1763,26 +1763,21 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="client-cpf">CPF</label><input type="text" id="client-cpf" value="${client.cpf || ''}"></div>
                     <div class="form-group"><label for="client-birthdate">Data de Nascimento</label><input type="date" id="client-birthdate" value="${client.birthdate || ''}"></div>
                     <div class="form-group"><label for="client-income">Renda (R$)</label><input type="number" id="client-income" value="${client.income || ''}"></div>
-                <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
-                    <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                   <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
-                    <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                    <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
-                </div>
 
-                <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
-                    <input type="checkbox" id="client-has-property" ${client.alreadyOwnsProperty ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
-                    <label for="client-has-property" style="margin-bottom: 0; margin-top: 10px;">Já possui imóvel no nome?</label>
-                </div>
-                <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
-                    <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
-                </div>
-                    <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
-                    <div class="form-group"><label for="client-commission">Comissão Personalizada (%)</label><input type="number" id="client-commission" placeholder="Padrão: ${db.settings.defaultCommission}%" value="${client.commission || ''}"></div>
-                    <div class="form-group"><label for="client-stageId">Etapa do Funil</label><select id="client-stageId">${funnelOptions}</select></div>
-                    <div class="form-group"><label for="client-lead-source">Origem do Lead</label><select id="client-lead-source"><option value="">Selecione...</option>${sourceOptions}</select></div>
-                    <div class="form-group full-width"><label for="client-propertyId">Imóvel de Interesse</label><select id="client-propertyId"><option value="">Nenhum</option>${propertyOptions}</select></div>
-                    <div class="form-group full-width"><label for="client-notes">Observações</label><textarea id="client-notes">${client.notes || ''}</textarea></div>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                <input type="checkbox" id="client-formal-work" ${client.hasFormalWork ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
+                <label for="client-formal-work" style="margin-bottom: 0; margin-top: 10px;">Possui 3+ anos de carteira assinada?</label>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                <input type="checkbox" id="client-has-property" ${client.alreadyOwnsProperty ? 'checked' : ''} style="width: auto; flex-grow: 0; margin-top: 10px;">
+                <label for="client-has-property" style="margin-bottom: 0; margin-top: 10px;">Já possui imóvel no nome?</label>
+            </div>
+            <div class="form-group"><label for="client-property-value">Valor do Imóvel Pretendido (R$)</label><input type="number" id="client-property-value" value="${client.propertyValue || ''}"></div>
+            <div class="form-group"><label for="client-commission">Comissão Personalizada (%)</label><input type="number" id="client-commission" placeholder="Padrão: ${db.settings.defaultCommission}%" value="${client.commission || ''}"></div>
+            <div class="form-group"><label for="client-stageId">Etapa do Funil</label><select id="client-stageId">${funnelOptions}</select></div>
+            <div class="form-group"><label for="client-lead-source">Origem do Lead</label><select id="client-lead-source"><option value="">Selecione...</option>${sourceOptions}</select></div>
+            <div class="form-group full-width"><label for="client-propertyId">Imóvel de Interesse</label><select id="client-propertyId"><option value="">Nenhum</option>${propertyOptions}</select></div>
+            <div class="form-group full-width"><label for="client-notes">Observações</label>
 <div class="form-group full-width" style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
     <label style="font-size: 1.1rem; color: var(--secondary-color); margin-bottom: 1rem; display: block;">Dados do Cônjuge (Opcional)</label>
 
@@ -2037,8 +2032,24 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="prop-parcelas-semestrais">Parcelas Semestrais</label><input type="text" id="prop-parcelas-semestrais" value="${prop.parcelasSemestrais || ''}" placeholder="Ex: 6x de R$ 10.000"></div>
                     <div class="form-group"><label for="prop-delivery-date">Data de Entrega</label><input type="date" id="prop-delivery-date" value="${prop.deliveryDate || ''}"></div>
                     <div class="form-group"><label for="prop-link">Link (Tour Virtual, Site)</label><input type="url" id="prop-link" value="${prop.link || ''}"></div>
-                    <div class="form-group full-width"><label for="prop-video-link">Link do Vídeo (YouTube, Vimeo)</label><input type="url" id="prop-video-link" value="${prop.videoLink || ''}"></div>
-                    <div class="form-group full-width"><label for="prop-description">Descrição Textual</label><textarea id="prop-description" placeholder="Use este campo para um texto de marketing, detalhes sobre a unidade, etc.">${prop.description || ''}</textarea></div>
+                    <div class="form-group full-width"><label for="prop-video-link">Link do Vídeo (YouTube, Vimeo)</label>
+                    <input type="url" id="prop-video-link" value="${
+                        // CORREÇÃO: Converte o link 'embed' de volta para o link 'watch'/'vimeo' original
+                        (url => {
+                            if (!url) return '';
+                            if (url.includes('youtube.com/embed/')) {
+                                const videoId = url.split('embed/')[1];
+                                return `https://www.youtube.com/watch?v=${videoId}`;
+                            }
+                            if (url.includes('player.vimeo.com/video/')) {
+                                const videoId = url.split('video/')[1];
+                                return `https://vimeo.com/${videoId}`;
+                            }
+                            return url; // Retorna o link original se não for embed
+                        })(prop.videoLink) || ''
+                    }">
+                </div>
+                <div class="form-group full-width"><label for="prop-description">Descrição Textual</label><textarea id="prop-description" placeholder="Use este campo para um texto de marketing, detalhes sobre a unidade, etc.">${prop.description || ''}</textarea></div>
                     
                     <div class="form-group"><label for="prop-condo-fee">Valor Estimado do Condomínio (R$)</label><input type="number" id="prop-condo-fee" value="${prop.condoFee || ''}" placeholder="Ex: 500"></div>
                     <div class="form-group"><label for="prop-dev-financing">Detalhes Financiamento Construtora</label><input type="text" id="prop-dev-financing" value="${prop.devFinancing || ''}" placeholder="Ex: Até 80% da entrada em 36x"></div>
@@ -2400,20 +2411,27 @@ const getStaleClientsForArchiving = () => {
                     <div class="form-group"><label for="event-time">Hora</label><input type="time" id="event-time" value="${event.time || ''}"></div>
                     <div class="form-group">
                         <label for="event-recurrence">Recorrência</label>
-                        <select id="event-recurrence">
+                        <select id="event-recurrence" onchange="document.getElementById('event-end-date-group').style.display = this.value === 'none' ? 'none' : 'block'">
                             <option value="none" ${!event.recurrence || event.recurrence === 'none' ? 'selected' : ''}>Nunca</option>
                             <option value="daily" ${event.recurrence === 'daily' ? 'selected' : ''}>Diariamente</option>
                             <option value="weekly" ${event.recurrence === 'weekly' ? 'selected' : ''}>Semanalmente</option>
                             <option value="monthly" ${event.recurrence === 'monthly' ? 'selected' : ''}>Mensalmente</option>
                         </select>
                     </div>
-                    <div class="form-group"><label for="event-end-date">Data Final da Recorrência (Opcional)</label><input type="date" id="event-end-date" value="${event.endDate || ''}"></div>
+                    <div class="form-group" id="event-end-date-group"><label for="event-end-date">Data Final da Recorrência (Opcional)</label><input type="date" id="event-end-date" value="${event.endDate || ''}"></div>
                     <div class="form-group full-width"><label for="event-description">Descrição</label><textarea id="event-description">${event.description || ''}</textarea></div>
                 </div>
             `;
         };
 
         document.getElementById('add-event-btn').addEventListener('click', () => {
+         openModal('Novo Compromisso', getEventFormHtml({}, today), 'event');
+            // INÍCIO DA CORREÇÃO: Esconde o campo de data final se a recorrência for 'Nunca'
+            setTimeout(() => {
+                const recurrenceSelect = document.getElementById('event-recurrence');
+                if (recurrenceSelect) recurrenceSelect.dispatchEvent(new Event('change'));
+            }, 100);
+            // FIM DA CORREÇÃO
             const today = new Date().toISOString().slice(0, 10);
             openModal('Novo Compromisso', getEventFormHtml({}, today), 'event');
         });
@@ -2539,6 +2557,13 @@ const getStaleClientsForArchiving = () => {
         });
 
         document.getElementById('calendar-grid').addEventListener('click', e => {
+openModal('Editar Compromisso', getEventFormHtml(event), 'event', eventId);
+            // INÍCIO DA CORREÇÃO: Esconde o campo de data final se a recorrência for 'Nunca'
+            setTimeout(() => {
+                const recurrenceSelect = document.getElementById('event-recurrence');
+                if (recurrenceSelect) recurrenceSelect.dispatchEvent(new Event('change'));
+            }, 100);
+            // FIM DA CORREÇÃO
             const dayElement = e.target.closest('.calendar-day');
             if (!dayElement) return;
 
@@ -3842,8 +3867,7 @@ if (client.spouseName) {
         <h3>Dados do Cônjuge</h3>
         <p><strong>Nome:</strong> ${client.spouseName}</p>
         <p><strong>CPF:</strong> ${client.spouseCpf || 'Não informado'}</p>
-        <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
-        <p><strong>Renda:</strong> ${formatCurrency(client.spouseIncome)}</p>
+        <p><strong>Data de Nascimento:</strong> ${formatDate(client.spouseBirthdate)}</p> <p><strong>Renda:</strong> ${formatCurrency(client.spouseIncome)}</p>
         <p><strong>Compõe Renda?</strong> ${client.spouseComposesIncome ? 'Sim' : 'Não'}</p>
     `;
 }
@@ -3867,10 +3891,9 @@ if (client.spouseName) {
                 <p><strong>CPF:</strong> ${client.cpf || ''}</p>
                 <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
 
-                ${spouseHtml} <h3>Dados Financeiros e de Interesse</h3>
-                <p><strong>Data de Nascimento:</strong> ${formatDate(client.birthdate)}</p>
-                
-                <h3>Dados Financeiros e de Interesse</h3>
+            ${spouseHtml} 
+
+            <h3>Dados Financeiros e de Interesse</h3>
                 <p><strong>Renda Declarada:</strong> ${formatCurrency(client.income)}</p>
                 <p><strong>Origem do Lead:</strong> ${client.leadSource || 'Não informada'}</p>
                 <p><strong>Imóvel de Interesse:</strong> ${property ? property.name : 'Não selecionado'}</p>
@@ -5180,10 +5203,21 @@ if (newStageId !== oldStageId) {
 
         document.getElementById('dashboard-content').addEventListener('click', e => {
             const eventItem = e.target.closest('.dashboard-event-item');
-            if (eventItem) {
-                // (Cole este bloco dentro do 'dashboard-content'.addEventListener)
 
-        const staleClientItem = e.target.closest('.stale-client-item');
+            // (INÍCIO DA CORREÇÃO) Bloco movido para fora do 'if (eventItem)'
+            const staleClientItem = e.target.closest('.stale-client-item');
+            if (staleClientItem) {
+                const clientId = staleClientItem.dataset.clientId;
+                const client = db.clients.find(c => c.id == clientId);
+                if (client) {
+                    openModal('Editar Cliente', getClientFormHtml(client), 'client', clientId);
+                }
+                return;
+            }
+            // (FIM DA CORREÇÃO)
+
+            if (eventItem) {
+                // (O comentário que estava aqui foi removido)
         if (staleClientItem) {
             const clientId = staleClientItem.dataset.clientId;
             const client = db.clients.find(c => c.id == clientId);
