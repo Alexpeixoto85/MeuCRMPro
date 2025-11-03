@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5308,7 +5307,7 @@ const getStaleClientsForArchiving = () => {
                         commission: parseFloat(document.getElementById('client-commission').value) || null,
                         stageId: parseInt(document.getElementById('client-stageId').value),
                         leadSource: document.getElementById('client-lead-source').value,
-                        propertyId: document.getElementById('client-propertyId').value ? parseInt(document.getElementById('client-propertyId').value) : null,
+                        propertyId: document.getElementById('client-propertyId').value ? parseFloat(document.getElementById('client-propertyId').value) : null,
                         variationId: document.getElementById('client-variationId').value ? parseFloat(document.getElementById('client-variationId').value) : null,
                         notes: document.getElementById('client-notes').value,
                         // Dados do Cônjuge
