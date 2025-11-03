@@ -3905,43 +3905,45 @@ if (analysis.compatibilityScore >= 100) {
         };
 
         const getAttendedClientRowHtml = (client = {}) => {
-            const clientId = client.id || `temp_${Date.now()}`; // ID da *linha* do relatório
-            const selectedClientId = client.clientId || ''; // ID do *cliente* do db
+    const clientId = client.id || `temp_${Date.now()}`; // ID da *linha* do relatório
+    const selectedClientId = client.clientId || ''; // ID do *cliente* do db
 
-            // Ordena os clientes por nome para o dropdown
-            const clientOptions = db.clients
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map(c => 
-                `<option value="${c.id}" ${selectedClientId == c.id ? 'selected' : ''}>${c.name}</option>`
-            ).join('');
+    // Ordena os clientes por nome para o dropdown
+    const clientOptions = db.clients
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(c => 
+        `<option value="${c.id}" ${selectedClientId == c.id ? 'selected' : ''}>${c.name}</option>`
+    ).join('');
 
-            return `
-                <div class="attended-client-item" data-id="${clientId}" data-selected-client-id="${selectedClientId}" style="grid-template-columns: 1fr 1fr 1fr auto; align-items: end; gap: 0.8rem;">
-                    
-                    <div class="form-group" style="grid-column: 1 / -1;">
-                        <label>Selecionar Cliente Existente (Opcional)</label>
-                        <select class="attended-client-select">
-                            <option value="">-- Novo Cliente (digite abaixo) --</option>
-                            ${clientOptions}
-                        </select>
-                    </div>
+    return `
+        <div class="attended-client-item" data-id="${clientId}" data-selected-client-id="${selectedClientId}" style="grid-template-columns: 1fr 1fr auto; align-items: end; gap: 0.8rem;">
 
-                    <div class="form-group">
-                        <label>Nome do Cliente</label>
-                        <input type="text" class="attended-client-name" value="${client.name || ''}" placeholder="Nome do Cliente">
-                    </div>
-                    <div class="form-group">
-                        <label>Contato (Telefone)</label>
-                        <input type="text" class="attended-client-phone" value="${client.phone || ''}" placeholder="Contato (Telefone)">
-                    </div>
-                    <div class="form-group">
-                        <label>Observação</label>
-                        <input type="text" class="attended-client-obs" value="${client.obs || ''}" placeholder="O que procurou?">
-                    </div>
-                    <button type="button" class="btn-danger remove-attended-client-btn"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-        };
+            <div class="form-group" style="grid-column: 1 / -1;"> {/* Linha inteira de cima */}
+                <label>Selecionar Cliente Existente (Opcional)</label>
+                <select class="attended-client-select">
+                    <option value="">-- Novo Cliente (digite abaixo) --</option>
+                    ${clientOptions}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Nome do Cliente</label>
+                <input type="text" class="attended-client-name" value="${client.name || ''}" placeholder="Nome do Cliente">
+            </div>
+            <div class="form-group">
+                <label>Contato (Telefone)</label>
+                <input type="text" class="attended-client-phone" value="${client.phone || ''}" placeholder="Contato (Telefone)">
+            </div>
+
+            <button type="button" class="btn-danger remove-attended-client-btn"><i class="fas fa-trash"></i></button>
+
+            <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+                <label>Observação sobre este cliente</label>
+                <textarea class="attended-client-obs" rows="2" placeholder="Descreva o que o cliente procurou, se agendou visita, etc...">${client.obs || ''}</textarea>
+            </div>
+        </div>
+    `;
+};
 
         const addAttendedClientRow = () => {
             document.getElementById('attended-clients-list').insertAdjacentHTML('beforeend', getAttendedClientRowHtml());
