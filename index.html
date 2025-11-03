@@ -4094,15 +4094,14 @@ if (analysis.compatibilityScore >= 100) {
                  openModal(title, modalBodyHtml, 'view', null, false);
                  
                  document.getElementById('print-modal-btn').addEventListener('click', () => {
-                    const headerPdfHtml = getDocumentHeaderHtml();
-                    const fullPrintHtml = `
-                        <div class="pdf-document-container">
-                            ${headerPdfHtml}
-                            <h1>Relatório de Plantão</h1>
-                            ${reportHtml}
-                        </div>`;
-                    printContent(fullPrintHtml, title);
-                 });
+                // const headerPdfHtml = getDocumentHeaderHtml(); // LINHA APAGADA
+                const fullPrintHtml = `
+                    <div class="pdf-document-container">
+                        <h1>Relatório de Plantão</h1>
+                        ${reportHtml}
+                    </div>`;
+                printContent(fullPrintHtml, title);
+             });
             }
         });
         
