@@ -3527,10 +3527,14 @@ const getStaleClientsForArchiving = () => {
         }
         
         // --- Lógica de Cor para o Score ---
-        let scoreClass = 'danger';
-        if (analysis.compatibilityScore >= 80) scoreClass = 'success';
-        else if (analysis.compatibilityScore >= 60) scoreClass = 'warning';
-        // --- Fim da Lógica de Cor ---
+let scoreClass = 'danger'; // Vermelho por padrão
+if (analysis.compatibilityScore >= 100) {
+    scoreClass = 'success'; // Verde (somente 100% ou mais)
+} else if (analysis.compatibilityScore >= 80) {
+    scoreClass = 'warning'; // Amarelo/Aviso (entre 80% e 99.9%)
+}
+// Abaixo de 80% ele automaticamente fica 'danger' (definido na primeira linha)
+// --- Fim da Lógica de Cor ---
 
         const resultClass = analysis.isCompatible ? 'highlight-success' : 'highlight-danger';
         const resultText = analysis.isCompatible ? 'RENDA COMPATÍVEL' : 'RENDA INSUFICIENTE PARA FINANCIAMENTO DE 80%';
@@ -3539,7 +3543,7 @@ const getStaleClientsForArchiving = () => {
         // Pega o novo motivo da análise
         const reasonText = analysis.rateReason ? `(${analysis.rateReason})` : '';
         // Pega a nova composição da renda
-        const incomeComposition = analysis.incomeReason ? `<p style="margin-top: -10px;"><small><strong>Composição:</strong> ${analysis.incomeReason}</small></p>` : '';
+        const incomeComposition = analysis.incomeReason ? `<p style="margin-top: 5px;"><small><strong>Composição:</strong> ${analysis.incomeReason}</small></p>` : '';
 
 
         /* ================================================================
@@ -3563,7 +3567,7 @@ const getStaleClientsForArchiving = () => {
 
             <div class="analysis-result">
                 <h4>Análise para <strong>${clientName}</strong></h4>
-                <p style="margin-top:-10px;"><strong>Empreendimento:</strong> ${propertyName} | <strong>Variação:</strong> ${variationName}</p>
+                <p style="margin-top: 5px;"><strong>Empreendimento:</strong> ${propertyName} | <strong>Variação:</strong> ${variationName}</p>
                 <hr>
                 <p><strong>Valor de Tabela (Venda):</strong> ${formatCurrency(analysis.listPrice)}</p>
                 <p><strong>Valor de Avaliação (Base do Cálculo):</strong> ${formatCurrency(analysis.propertyValue)}</p>
