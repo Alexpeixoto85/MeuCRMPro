@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -3904,9 +3905,27 @@ if (analysis.compatibilityScore >= 100) {
         };
 
         const getAttendedClientRowHtml = (client = {}) => {
-            const clientId = client.id || `temp_${Date.now()}`;
+            const clientId = client.id || `temp_${Date.now()}`; // ID da *linha* do relatório
+            const selectedClientId = client.clientId || ''; // ID do *cliente* do db
+
+            // Ordena os clientes por nome para o dropdown
+            const clientOptions = db.clients
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(c => 
+                `<option value="${c.id}" ${selectedClientId == c.id ? 'selected' : ''}>${c.name}</option>`
+            ).join('');
+
             return `
-                <div class="attended-client-item" data-id="${clientId}">
+                <div class="attended-client-item" data-id="${clientId}" data-selected-client-id="${selectedClientId}" style="grid-template-columns: 1fr 1fr 1fr auto; align-items: end; gap: 0.8rem;">
+                    
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Selecionar Cliente Existente (Opcional)</label>
+                        <select class="attended-client-select">
+                            <option value="">-- Novo Cliente (digite abaixo) --</option>
+                            ${clientOptions}
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label>Nome do Cliente</label>
                         <input type="text" class="attended-client-name" value="${client.name || ''}" placeholder="Nome do Cliente">
@@ -3916,8 +3935,8 @@ if (analysis.compatibilityScore >= 100) {
                         <input type="text" class="attended-client-phone" value="${client.phone || ''}" placeholder="Contato (Telefone)">
                     </div>
                     <div class="form-group">
-                        <label>Observação (O que procurou?)</label>
-                        <input type="text" class="attended-client-obs" value="${client.obs || ''}" placeholder="Observação (Ex: 3 quartos, R$ 500k)">
+                        <label>Observação</label>
+                        <input type="text" class="attended-client-obs" value="${client.obs || ''}" placeholder="O que procurou?">
                     </div>
                     <button type="button" class="btn-danger remove-attended-client-btn"><i class="fas fa-trash"></i></button>
                 </div>
@@ -3933,6 +3952,32 @@ if (analysis.compatibilityScore >= 100) {
             if (removeBtn) {
                 removeBtn.closest('.attended-client-item').remove();
             }
+
+            // --- INÍCIO DA NOVA LÓGICA ---
+            // Detecta a mudança no <select> que acabamos de adicionar
+            if (e.target.classList.contains('attended-client-select')) {
+                const select = e.target;
+                const selectedClientId = select.value;
+                const row = select.closest('.attended-client-item');
+                
+                if (selectedClientId) {
+                    // Se um cliente foi selecionado, busca ele no banco de dados
+                    const client = db.clients.find(c => c.id == selectedClientId);
+                    if (client) {
+                        // Preenche os campos de nome e telefone
+                        row.querySelector('.attended-client-name').value = client.name;
+                        row.querySelector('.attended-client-phone').value = client.phone;
+                        // Armazena o ID do cliente na própria linha
+                        row.dataset.selectedClientId = client.id;
+                    }
+                } else {
+                    // Se o usuário selecionou "Novo Cliente", limpa os campos
+                    row.querySelector('.attended-client-name').value = '';
+                    row.querySelector('.attended-client-phone').value = '';
+                    row.dataset.selectedClientId = ''; // Limpa o ID
+                }
+            }
+            // --- FIM DA NOVA LÓGICA ---
         };
 
         document.getElementById('add-duty-report-btn').addEventListener('click', () => {
@@ -3989,8 +4034,15 @@ if (analysis.compatibilityScore >= 100) {
                         </thead>
                         <tbody>
                             ${report.attendedClients.map(client => `
-                                <tr>
-                                    <td>${client.name}</td>
+                               <tr>
+                                    <td>
+                                        ${client.clientId ? 
+                                            // Se tiver um ID, cria um link
+                                            `<a href="#" class="view-client-from-report" data-client-id="${client.clientId}" style="color: var(--accent-color); text-decoration: underline;">${client.name}</a>` :
+                                            // Senão, só mostra o nome
+                                            client.name
+                                        }
+                                    </td>
                                     <td>${client.phone}</td>
                                     <td>${client.obs}</td>
                                 </tr>
@@ -4253,7 +4305,39 @@ if (analysis.compatibilityScore >= 100) {
                 }
             }
         });
-
+// ==========================================
+        // INÍCIO: NOVO CÓDIGO (Passo 7)
+        // ==========================================
+        // Adiciona o listener para o link do cliente no relatório de plantão
+        modalBody.addEventListener('click', e => {
+            const clientLink = e.target.closest('a.view-client-from-report');
+            if (clientLink) {
+                e.preventDefault(); // Impede o link de navegar
+                const clientId = clientLink.dataset.clientId;
+                const client = db.clients.find(c => c.id == clientId);
+                
+                if (client) {
+                    // Fecha o modal atual (Relatório)
+                    closeModal();
+                    // Muda para a aba de clientes
+                    switchPanel('clients');
+                    
+                    // Abre a ficha do cliente (reutilizando a lógica)
+                    const clientHtml = getClientDetailsHtml(clientId);
+                    const modalBodyHtml = `
+                        <div class="record-details" data-client-id="${clientId}">${clientHtml}</div>
+                        <div class="modal-footer" style="display:flex; justify-content: flex-end; margin-top: 1rem;">
+                            <button class="btn-primary" id="print-modal-btn"><i class="fas fa-print"></i> Imprimir</button>
+                        </div>`;
+                    openModal(`Ficha de ${client.name}`, modalBodyHtml, 'view', null, false);
+                    document.getElementById('print-modal-btn').addEventListener('click', () => {
+                        printContent(clientHtml, `Ficha do Cliente: ${client.name}`);
+                    });
+                } else {
+                    alert('Erro: Cliente não encontrado.');
+                }
+            }
+        });
 
         // ==========================================
         // GESTÃO FINANCEIRA
@@ -5470,66 +5554,67 @@ if (analysis.compatibilityScore >= 100) {
                 }
                 
                 // --- GESTÃO DE RELATÓRIOS DE PLANTÃO ---
-                else if (currentEntityType === 'dutyReport') {
-                    const attendedClients = [];
-                    document.querySelectorAll('.attended-client-item').forEach(item => {
-                        attendedClients.push({
-                            id: item.dataset.id.startsWith('temp_') ? Date.now() + Math.random() : item.dataset.id,
-                            name: item.querySelector('.attended-client-name').value,
-                            phone: item.querySelector('.attended-client-phone').value,
-                            obs: item.querySelector('.attended-client-obs').value,
-                        });
+            else if (currentEntityType === 'dutyReport') {
+                const attendedClients = [];
+                document.querySelectorAll('.attended-client-item').forEach(item => {
+                    attendedClients.push({
+                        id: item.dataset.id.startsWith('temp_') ? Date.now() + Math.random() : item.dataset.id,
+                        name: item.querySelector('.attended-client-name').value,
+                        phone: item.querySelector('.attended-client-phone').value,
+                        obs: item.querySelector('.attended-client-obs').value,
+                        clientId: item.dataset.selectedClientId || null
                     });
-                    
-                    const reportData = {
-                        id: currentEditingId || Date.now(),
-                        date: document.getElementById('duty-date').value,
-                        location: document.getElementById('duty-location').value,
-                        summary: document.getElementById('duty-summary').value,
-                        attendedClients: attendedClients
-                    };
+                }); // <-- **A CORREÇÃO PRINCIPAL ESTÁ AQUI**
 
-                    if (!reportData.date || !reportData.location) {
-                        throw new Error('Data e Local do plantão são obrigatórios.');
-                    }
+                const reportData = {
+                    id: currentEditingId || Date.now(),
+                    date: document.getElementById('duty-date').value,
+                    location: document.getElementById('duty-location').value,
+                    summary: document.getElementById('duty-summary').value,
+                    attendedClients: attendedClients
+                };
 
-                    if (currentEditingId) {
-                        const index = db.dutyReports.findIndex(r => r.id == currentEditingId);
-                        db.dutyReports[index] = reportData;
-                    } else {
-                        db.dutyReports.push(reportData);
-                    }
-                    renderDutyReportsTable();
+                if (!reportData.date || !reportData.location) {
+                    throw new Error('Data e Local do plantão são obrigatórios.');
                 }
-                
-                // --- GESTÃO DE NOTAS (KNOWLEDGE BASE) ---
-                else if (currentEntityType === 'knowledgeBase') {
-                    const videoLinks = document.getElementById('note-video-links').value
-                        .split('\n')
-                        .filter(Boolean) // Remove linhas em branco
-                        .map(url => getEmbedVideoUrl(url)); // Converte para embed
-                        
-                    const noteData = {
-                        id: currentEditingId || Date.now(),
-                        title: document.getElementById('note-title').value,
-                        content: document.getElementById('note-content').value,
-                        images: tempNoteImages,
-                        videos: videoLinks,
-                        lastModified: Date.now()
-                    };
 
-                    if (!noteData.title) {
-                        throw new Error('O Título da nota é obrigatório.');
-                    }
-
-                    if (currentEditingId) {
-                        const index = db.knowledgeBase.findIndex(n => n.id == currentEditingId);
-                        db.knowledgeBase[index] = noteData;
-                    } else {
-                        db.knowledgeBase.push(noteData);
-                    }
-                    renderKnowledgeBase();
+                if (currentEditingId) {
+                    const index = db.dutyReports.findIndex(r => r.id == currentEditingId);
+                    db.dutyReports[index] = reportData;
+                } else {
+                    db.dutyReports.push(reportData);
                 }
+                renderDutyReportsTable();
+            } // <-- Este '}' fecha o 'else if' do dutyReport
+
+            // --- GESTÃO DE NOTAS (KNOWLEDGE BASE) ---
+            else if (currentEntityType === 'knowledgeBase') {
+                const videoLinks = document.getElementById('note-video-links').value
+                    .split('\n')
+                    .filter(Boolean) // Remove linhas em branco
+                    .map(url => getEmbedVideoUrl(url)); // Converte para embed
+
+                const noteData = {
+                    id: currentEditingId || Date.now(),
+                    title: document.getElementById('note-title').value,
+                    content: document.getElementById('note-content').value,
+                    images: tempNoteImages,
+                    videos: videoLinks,
+                    lastModified: Date.now()
+                };
+
+                if (!noteData.title) {
+                    throw new Error('O Título da nota é obrigatório.');
+                }
+
+                if (currentEditingId) {
+                    const index = db.knowledgeBase.findIndex(n => n.id == currentEditingId);
+                    db.knowledgeBase[index] = noteData;
+                } else {
+                    db.knowledgeBase.push(noteData);
+                }
+                renderKnowledgeBase();
+            }
 
                 // --- GESTÃO DE DOCUMENTOS (RECIBO) ---
                 else if (currentEntityType === 'receipt') {
