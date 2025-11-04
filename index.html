@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1325,6 +1326,9 @@
 
 </div>
             <h3>Lançamentos Financeiros</h3>
+<div class="toolbar">
+    <input type="text" id="financial-search" placeholder="Buscar por descrição ou categoria...">
+</div>
             <div class="table-container">
                 <table id="financial-records-table">
                     <thead>
@@ -1521,6 +1525,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         let tempNoteImages = []; 
         let currentCalendarDate = new Date();
         let currentPaymentDateToConfirm = null;
+        let financialFilterState = 'all'; // 'all', 'upcoming'
         
         // ==========================================
         // INÍCIO: NOVAS VARIÁVEIS DE ESTADO
@@ -1823,13 +1828,18 @@ const getStaleClientsForArchiving = () => {
                 case 'duty-reports': renderDutyReportsTable(); break;
                 case 'informacoes': renderKnowledgeBase(); break;
                 case 'documents': renderDocumentsTable(); break;
-                case 'financial': renderFinancialBI(); renderFinancialRecordsTable(); break;
+                case 'financial': renderFinancialBI(); renderFinancialRecordsTable(document.getElementById('financial-search')?.value || ''); break;
                 case 'links': renderLinksTable(); break;
                 case 'settings': renderSettings(); break;
             }
         };
     
         navButtons.forEach(button => {
+if (button.dataset.panel === 'financial') {
+    button.addEventListener('click', () => {
+        financialFilterState = 'all'; // Reseta o filtro ao clicar no nav
+    });
+}
             button.addEventListener('click', () => switchPanel(button.dataset.panel));
         });
     
@@ -4542,76 +4552,164 @@ const minIncomeHtml = minIncome > 0
             document.getElementById('bi-balance').className = balance >= 0 ? 'financial-amount success' : 'financial-amount danger';
         };
 
-        const renderFinancialRecordsTable = () => {
-            const tbody = document.querySelector('#financial-records-table tbody');
-            tbody.innerHTML = '';
-            
-            if (db.financialRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento financeiro.</td></tr>';
-                return;
-            }
+        const renderFinancialRecordsTable = (filter = '') => {
+    const tbody = document.querySelector('#financial-records-table tbody');
+    tbody.innerHTML = '';
 
-            // Ordena por data de início, mais recente primeiro
-            const sortedRecords = [...db.financialRecords].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    // 1. Filtra os registros com base no ESTADO (All ou Upcoming)
+    let baseRecords = [...db.financialRecords];
 
-            sortedRecords.forEach(record => {
-                const typeClass = record.type === 'income' ? 'success' : 'danger';
-                const typeText = record.type === 'income' ? 'Receita' : 'Despesa';
-                
-                // Pega o status da primeira parcela ou da parcela de hoje
-                const today = new Date().toISOString().slice(0, 10);
-                const firstPayment = record.payments[0];
-                const todayPayment = record.payments.find(p => p.date === today);
-                
-                const displayPayment = todayPayment || firstPayment;
-                let statusHtml = '';
-                if (displayPayment.status === 'paid') {
-                    statusHtml = `<span class="status-realizado">Realizado</span>`;
-                } else if (displayPayment.date < today) {
-                    statusHtml = `<strong style="color: var(--danger-color);">Vencido</strong>`;
-                } else {
-                    statusHtml = `Pendente`;
-                }
+    if (financialFilterState === 'upcoming') {
+        const today = new Date();
+        const todayStr = today.toISOString().slice(0, 10);
+        // Precisamos resetar 'today' pois setDate() modifica o objeto
+        const next30DaysDate = new Date(); 
+        const next30Days = new Date(next30DaysDate.setDate(next30DaysDate.getDate() + 30)).toISOString().slice(0, 10);
 
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${formatDate(displayPayment.date)} ${record.recurrence === 'monthly' ? '<i class="fas fa-sync-alt" title="Recorrente"></i>' : ''}</td>
-                        <td>${record.description}</td>
-                        <td>${record.category}</td>
-                        <td><strong style="color: var(--${typeClass}-color);">${typeText}</strong></td>
-                        <td>${formatCurrency(record.value)} ${record.recurrence === 'monthly' ? '/mês' : ''}</td>
-                        <td class="action-buttons">
-                            ${record.recurrence === 'monthly' ? `<button title="Gerenciar Parcelas" data-action="manage" data-id="${record.id}"><i class="fas fa-calendar-check"></i></button>` : ''}
-                            <button title="Editar" data-action="edit" data-id="${record.id}"><i class="fas fa-edit"></i></button>
-                            <button title="Excluir" data-action="delete" data-id="${record.id}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        };
-        
-        document.querySelector('#financial-records-table tbody').addEventListener('click', e => {
-            const button = e.target.closest('button');
-            if (!button) return;
-            const id = button.closest('tr').querySelector('button[data-id]').dataset.id;
-            const action = button.dataset.action;
-            const record = db.financialRecords.find(r => r.id == id);
-
-            if (action === 'edit') {
-                openModal('Editar Lançamento', getFinancialFormHtml(record), 'financialRecord', id);
-            } else if (action === 'delete') {
-                if (confirm(`Deseja realmente excluir o lançamento "${record.description}" e todas as suas parcelas?`)) {
-                    db.financialRecords = db.financialRecords.filter(r => r.id != id);
-                    saveData();
-                    renderFinancialBI();
-                    renderFinancialRecordsTable();
-                }
-            } else if (action === 'manage') {
-                const manageHtml = getPaymentManagementHtml(id);
-                openModal(`Gerenciar Parcelas: ${record.description}`, manageHtml, 'paymentManager', id, false);
-            }
+        baseRecords = db.financialRecords.filter(record => {
+            // Verifica se *existe* alguma parcela pendente nos próximos 30 dias
+            return record.payments.some(p => 
+                p.status === 'pending' && 
+                p.date >= todayStr && 
+                p.date <= next30Days
+            );
         });
+    }
+
+    // 2. Ordena os registros (se for 'upcoming', ordena pela data da próxima parcela)
+    const sortedRecords = baseRecords.sort((a, b) => {
+        if (financialFilterState === 'upcoming') {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const next30Days = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().slice(0, 10);
+
+            const nextPaymentA = a.payments.find(p => p.status === 'pending' && p.date >= todayStr && p.date <= next30Days);
+            const nextPaymentB = b.payments.find(p => p.status === 'pending' && p.date >= todayStr && p.date <= next30Days);
+
+            return new Date(nextPaymentA.date) - new Date(nextPaymentB.date);
+        }
+        // Ordenação padrão
+        return new Date(b.startDate) - new Date(a.startDate);
+    });
+
+    // 3. Aplica o filtro de BUSCA (como antes)
+    const lowerFilter = filter.toLowerCase();
+    const filteredRecords = sortedRecords.filter(record =>
+        (record.description || '').toLowerCase().includes(lowerFilter) ||
+        (record.category || '').toLowerCase().includes(lowerFilter)
+    );
+
+    // 4. Verifica se o resultado filtrado está vazio
+    if (filteredRecords.length === 0) {
+        if (financialFilterState === 'upcoming' && baseRecords.length === 0) {
+             tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento a vencer nos próximos 30 dias.</td></tr>';
+        } else if (db.financialRecords.length > 0 && filter) {
+            tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento encontrado para a busca: "' + filter + '"</td></tr>';
+        } else if (db.financialRecords.length === 0) {
+             tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento financeiro.</td></tr>';
+        } else if (financialFilterState === 'upcoming' && filteredRecords.length === 0) {
+             tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento "A Vencer" corresponde à busca.</td></tr>';
+        } else {
+             tbody.innerHTML = '<tr><td colspan="6">Nenhum lançamento encontrado.</td></tr>';
+        }
+        return;
+    }
+
+    // 5. Desenha a tabela
+    filteredRecords.forEach(record => {
+        const typeClass = record.type === 'income' ? 'success' : 'danger';
+        const typeText = record.type === 'income' ? 'Receita' : 'Despesa';
+
+        const today = new Date().toISOString().slice(0, 10);
+        const firstPayment = record.payments[0];
+        const todayPayment = record.payments.find(p => p.date === today);
+
+        // --- LÓGICA DE EXIBIÇÃO DA PARCELA ---
+        let displayPayment;
+        if (financialFilterState === 'upcoming') {
+            // Se o filtro é 'upcoming', *devemos* mostrar a próxima parcela a vencer
+            const todayDate = new Date();
+            const todayStr = todayDate.toISOString().slice(0, 10);
+            const next30DaysDate = new Date();
+            const next30Days = new Date(next30DaysDate.setDate(next30DaysDate.getDate() + 30)).toISOString().slice(0, 10);
+
+            // Encontra a primeira parcela pendente dentro da janela de 30 dias
+            displayPayment = record.payments.find(p => 
+                p.status === 'pending' && 
+                p.date >= todayStr && 
+                p.date <= next30Days
+            );
+
+            // Fallback (caso algo dê errado, improvável)
+            if (!displayPayment) displayPayment = todayPayment || firstPayment;
+
+        } else {
+            // Lógica padrão
+            displayPayment = todayPayment || firstPayment;
+        }
+        // --- FIM DA LÓGICA DE EXIBIÇÃO ---
+
+        let statusHtml = '';
+        if (displayPayment.status === 'paid') {
+            statusHtml = `<span class="status-realizado">Realizado</span>`;
+        } else if (displayPayment.date < today) {
+            statusHtml = `<strong style="color: var(--danger-color);">Vencido</strong>`;
+        } else {
+            statusHtml = `Pendente`;
+        }
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${formatDate(displayPayment.date)} ${record.recurrence === 'monthly' ? '<i class="fas fa-sync-alt" title="Recorrente"></i>' : ''}</td>
+                <td>${record.description}</td>
+                <td>${record.category}</td>
+                <td><strong style="color: var(--${typeClass}-color);">${typeText}</strong></td>
+                <td>${formatCurrency(record.value)} ${record.recurrence === 'monthly' ? '/mês' : ''}</td>
+                <td class="action-buttons">
+                    ${record.recurrence === 'monthly' ? `<button title="Gerenciar Parcelas" data-action="manage" data-id="${record.id}"><i class="fas fa-calendar-check"></i></button>` : ''}
+                    <button title="Editar" data-action="edit" data-id="${record.id}"><i class="fas fa-edit"></i></button>
+                    <button title="Excluir" data-action="delete" data-id="${record.id}"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+};
+        
+document.querySelector('#financial-records-table tbody').addEventListener('click', e => {
+    // 1. Encontra o botão exato que foi clicado (ou o ícone dentro dele)
+    const button = e.target.closest('button');
+// 2. Se o clique não foi em um botão, ignora.
+if (!button) return;
+// 3. Pega a 'action' e o 'id' DO BOTÃO QUE FOI CLICADO.
+//    Esta é a correção principal.
+const action = button.dataset.action;
+const id = button.dataset.id;
+// 4. Se o botão clicado não tiver um ID (como um botão 'fechar' de modal, etc.), ignora.
+if (!id) return;
+// 5. Encontra o registro financeiro correspondente
+const record = db.financialRecords.find(r => r.id == id);
+// 6. Se, por algum motivo, não encontrar o registro, avisa no console.
+if (!record) {
+    console.error("Erro: Registro financeiro não encontrado com o ID:", id);
+    return;
+}
+// 7. Executa a ação correta
+if (action === 'edit') {
+    // Abre o modal de edição
+    openModal('Editar Lançamento', getFinancialFormHtml(record), 'financialRecord', id);
+// ...
+} else if (action === 'delete') {
+    if (confirm(`Deseja realmente excluir o lançamento "${record.description}" e todas as suas parcelas?`)) {
+        db.financialRecords = db.financialRecords.filter(r => r.id != id);
+        saveData();
+        renderFinancialBI();
+        renderFinancialRecordsTable(document.getElementById('financial-search')?.value || '');
+    } // <-- ADICIONE ESTA CHAVE } AQUI
+} else if (action === 'manage') { // <-- AGORA ESTÁ CORRETO
+    // Abre o gerenciador de parcelas
+    const manageHtml = getPaymentManagementHtml(id);
+    openModal(`Gerenciar Parcelas: ${record.description}`, manageHtml, 'paymentManager', id, false);
+}
+});
         
         // ==========================================
         // GESTÃO DE DOCUMENTOS (CONTRATOS, RECIBOS)
@@ -6049,7 +6147,97 @@ const minIncomeHtml = minIncome > 0
                 }
             });
         };
+// --- Ouvinte para o card "A Vencer" ---
+document.getElementById('card-pending-payments').addEventListener('click', () => {
+    financialFilterState = 'upcoming'; // Define o estado do filtro
+    switchPanel('financial'); // Muda para o painel financeiro
+    // Limpa a busca de texto para não confundir os filtros
+    const searchInput = document.getElementById('financial-search');
+    if (searchInput) searchInput.value = '';
+    renderFinancialRecordsTable(); // Renderiza com o novo filtro de estado
+});
+// --- Ouvinte para a nova barra de busca financeira ---
+document.getElementById('panel-financial').addEventListener('input', e => {
+    if (e.target.id === 'financial-search') {
+        renderFinancialRecordsTable(e.target.value);
+    }
+});
+const getFinancialReportHtml = () => {
+    // Pega os valores dos cards de BI
+    const realizedRevenue = document.getElementById('bi-realized-revenue').textContent;
+    const realizedExpense = document.getElementById('bi-realized-expense').textContent;
+    const balance = document.getElementById('bi-balance').textContent;
+    const futureRevenue = document.getElementById('bi-future-revenue').textContent;
+    const futureExpense = document.getElementById('bi-future-expense').textContent;
 
+    let recordsHtml = '';
+    const allRecords = [...db.financialRecords].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+    if (allRecords.length === 0) {
+        recordsHtml = '<p>Nenhum lançamento financeiro registrado.</p>';
+    } else {
+        // Reutiliza o estilo da tabela do Relatório de Plantão para um visual consistente
+        recordsHtml = `
+        <table class="pdf-duty-report-table"> 
+            <thead>
+                <tr>
+                    <th>Data (1ª Parc.)</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${allRecords.map(record => `
+                   <tr>
+                        <td>${formatDate(record.startDate)} ${record.recurrence === 'monthly' ? '(Recorrente)' : ''}</td>
+                        <td>${record.description}</td>
+                        <td>${record.category}</td>
+                        <td>${record.type === 'income' ? 'Receita' : 'Despesa'}</td>
+                        <td>${formatCurrency(record.value)}</td>
+                   </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        `;
+    }
+
+    return `
+        <div class="pdf-content">
+            <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+
+            <h2>Resumo (BI)</h2>
+            <div class="report-grid">
+                <div class="report-card">
+                    <div class="value">${realizedRevenue}</div>
+                    <div class="label">Receita Realizada</div>
+                </div>
+                <div class="report-card">
+                    <div class="value">${realizedExpense}</div>
+                    <div class="label">Despesa Realizada</div>
+                </div>
+                <div class="report-card">
+                    <div class="value">${balance}</div>
+                    <div class="label">Saldo Atual</div>
+                </div>
+                <div class="report-card">
+                    <div class="value" style="font-size: 1.1rem;">${futureRevenue} / ${futureExpense}</div>
+                    <div class="label">A Vencer (Rec/Desp)</div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 10mm;">Todos os Lançamentos Registrados</h2>
+            ${recordsHtml}
+        </div>
+    `;
+};
+document.getElementById('generate-financial-report-btn').addEventListener('click', () => {
+    const reportHtml = getFinancialReportHtml();
+    const title = "Relatorio_Financeiro_" + new Date().toISOString().slice(0, 10);
+    // Chama a função de impressão que já existe no sistema
+    printContent(reportHtml, title); 
+});
         // Inicia o CRM
         init();
     });
