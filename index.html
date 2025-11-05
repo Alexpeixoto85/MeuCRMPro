@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -3139,7 +3138,7 @@ if (button.dataset.panel === 'financial') {
                     const eventDateTime = new Date(`${event.date}T${event.time || '00:00:00'}`);
                     const isOverdue = !event.completed && eventDateTime < now;
 
-                    // --- INÍCIO DA MODIFICAÇÃO (Etapa 1 de 2) ---
+                   // --- INÍCIO DA MODIFICAÇÃO (Etapa 1 de 2) ---
                     let whatsappButtonHtml = '';
 
                     // Verificamos as condições
@@ -3198,12 +3197,46 @@ if (button.dataset.panel === 'financial') {
                     closeModal();
                     renderAgendaCalendar();
                 }
+
             } else if (action === 'toggle-complete') {
                 event.completed = !event.completed;
                 saveData();
                 closeModal();
                 renderAgendaCalendar();
             }
+            
+            // --- INÍCIO DA ADIÇÃO ---
+            // Nova ação para o botão WhatsApp do modal da agenda
+            else if (action === 'day-view-whatsapp') {
+                const clientId = button.dataset.clientId;
+                const phone = (button.dataset.phone || '').replace(/\D/g, ''); // Garante que o tel. está limpo
+                
+                if (!phone) {
+                    alert('Erro: Cliente não possui telefone cadastrado.');
+                    return;
+                }
+                
+                // 1. Abre o WhatsApp
+                const url = `https://wa.me/${phone}`;
+                window.open(url, '_blank');
+                
+                // 2. Registra o contato no cliente (ESSENCIAL)
+                const client = db.clients.find(c => c.id == clientId);
+                if (client) {
+                    client.lastContact = new Date().toISOString().slice(0, 10);
+                    if (!client.contactHistory) client.contactHistory = [];
+                    
+                    client.contactHistory.push({
+                        date: client.lastContact,
+                        stageId: client.stageId
+                    });
+                    
+                    saveData();
+                    showToast(`Contato com ${client.name.split(' ')[0]} registrado!`);
+                }
+            }
+            // --- FIM DA ADIÇÃO ---
+
         });
 
          // ==========================================
