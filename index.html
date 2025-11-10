@@ -1120,9 +1120,6 @@
     <header>
         <div class="logo-container">
             <img id="header-logo" src="https://via.placeholder.com/150x50.png?text=Sua+Logo" alt="Logo">
-            <div class="broker-info">
-                <h1 id="header-broker-name">Nome do Corretor</h1>
-                <p id="header-broker-creci">CRECI: 00000</p>
             </div>
         </div>
         <nav>
@@ -1150,9 +1147,9 @@
 </div>
     </header>
 
-    <main>
+    <<main>
         <div id="panel-dashboard" class="panel active">
-            <h2>Dashboard</h2>
+            <h2>Dashboard - Alan Lucena</h2>
             <div id="dashboard-content" class="dashboard-grid"></div>
             <div id="funnel-chart-container">
                  <h3>Funil</h3>
@@ -1161,7 +1158,7 @@
         </div>
 
         <div id="panel-clients" class="panel">
-            <h2>Gestão de Clientes</h2>
+            <h2>Gestão de Clientes - Alan Lucena</h2>
             <div class="toolbar">
                 <input type="text" id="client-search" placeholder="Buscar por nome, contato ou CPF...">
                 <select id="client-source-filter" style="flex-grow: 0; min-width: 180px;">
@@ -1198,7 +1195,7 @@
         </div>
 
         <div id="panel-properties" class="panel">
-            <h2>Gestão de Imóveis (Empreendimentos)</h2>
+            <h2>Gestão de Imóveis (Empreendimentos) - Alan Lucena</h2>
             <div class="toolbar">
                 <input type="text" id="property-search" placeholder="Buscar por nome ou localização...">
                 <button id="add-property-btn" class="btn-primary"><i class="fas fa-plus"></i> Novo Imóvel</button>
@@ -1224,7 +1221,7 @@
         
         <div id="panel-agenda" class="panel">
             <div class="toolbar">
-                 <h2>Agenda de Compromissos</h2>
+                 <h2>Agenda de Compromissos - Alan Lucena</h2>
                  <button id="add-event-btn" class="btn-primary" style="margin-left: auto;"><i class="fas fa-plus"></i> Novo Compromisso</button>
             </div>
             <div id="calendar-container">
@@ -1239,7 +1236,7 @@
         </div>
 
         <div id="panel-duty-reports" class="panel">
-            <h2>Relatórios de Plantão</h2>
+            <h2>Relatórios de Plantão - Alan Lucena</h2>
             <div class="toolbar">
                 <button id="add-duty-report-btn" class="btn-primary"><i class="fas fa-plus"></i> Novo Relatório de Plantão</button>
             </div>
@@ -1259,7 +1256,7 @@
         </div>
         
         <div id="panel-informacoes" class="panel">
-            <h2>Informes e Notas</h2>
+            <h2>Informes e Notas - Alan Lucena</h2>
             <div class="toolbar">
                 <input type="text" id="info-search" placeholder="Buscar por título ou conteúdo...">
                 <button id="add-info-btn" class="btn-primary"><i class="fas fa-plus"></i> Nova Informação</button>
@@ -1269,7 +1266,7 @@
         </div>
 
         <div id="panel-documents" class="panel">
-            <h2>Gestão de Documentos</h2>
+            <h2>Gestão de Documentos - Alan Lucena</h2>
             <div class="toolbar">
                 <button id="add-contract-btn" class="btn-primary"><i class="fas fa-plus"></i> Gerar Contrato</button>
                 <button id="add-receipt-btn" class="btn-success"><i class="fas fa-receipt"></i> Gerar Recibo</button>
@@ -1293,7 +1290,7 @@
         
         <div id="panel-financial" class="panel">
             <div class="financial-panel-header">
-                <h2>Financeiro e Business Intelligence</h2>
+                <h2>Financeiro e Business Intelligence - Alan Lucena</h2>
                 <div class="header-buttons">
                     <button id="generate-financial-report-btn" class="btn-secondary"><i class="fas fa-file-invoice-dollar"></i> Gerar Relatório</button>
                     <button id="add-income-btn" class="btn-success"><i class="fas fa-plus"></i> Nova Receita</button>
@@ -1346,7 +1343,7 @@
         </div>
         
         <div id="panel-links" class="panel">
-            <h2></h2>
+            <h2>Links - Alan Lucena</h2>
             <div class="toolbar">
                 <button id="add-link-btn" class="btn-primary"><i class="fas fa-plus"></i> Novo Link</button>
             </div>
@@ -1365,7 +1362,7 @@
         </div>
 
         <div id="panel-settings" class="panel">
-            <h2></h2>
+            <h2>Configurações - Alan Lucena</h2>
             <div class="settings-grid">
                 <div class="settings-card">
                     <h3>Dados do Corretor</h3>
@@ -1418,9 +1415,9 @@
                     <input type="file" id="import-backup" accept=".json">
                     <button id="import-backup-btn" class="btn-secondary">Importar Backup</button>
                     <hr>
-<label>Importar APENAS Imóveis (JSON):</label>
-<input type="file" id="import-properties" accept=".json">
-<button id="import-properties-btn" class="btn-secondary" style="background-color: #27ae60; border-color: #27ae60;">Importar Imóveis</button>
+                    <label>Importar APENAS Imóveis (JSON):</label>
+                    <input type="file" id="import-properties" accept=".json">
+                    <button id="import-properties-btn" class="btn-secondary" style="background-color: #27ae60; border-color: #27ae60;">Importar Imóveis</button>
                     <hr>
                     <button id="delete-duplicates-btn" class="btn-danger">Excluir Clientes Duplicados</button>
                     <button id="clear-system-btn" class="btn-danger">Limpar Todo o Sistema</button>
@@ -1547,7 +1544,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     
         const defaultDb = {
             settings: {
-                brokerName: 'Nome do Corretor',
+                brokerName: 'Alan Lucena',
                 brokerCreci: 'CRECI: 00000',
                 brokerPhone: '5582999998888',
                 logoUrl: 'https://via.placeholder.com/150x50.png?text=Sua+Logo',
@@ -1848,8 +1845,6 @@ if (button.dataset.panel === 'financial') {
         });
     
         const updateHeader = () => {
-            document.getElementById('header-broker-name').textContent = db.settings.brokerName;
-            document.getElementById('header-broker-creci').textContent = db.settings.brokerCreci;
             document.getElementById('header-logo').src = db.settings.logoUrl;
         };
     
@@ -3276,7 +3271,7 @@ if (button.dataset.panel === 'financial') {
             }
 
             db.usefulLinks.forEach(link => {
-                const shortUrl = link.url; // Fallback para links antigos
+                const shortUrl = link.shortUrl || link.url; // Fallback para links antigos
                 tbody.innerHTML += `
                     <tr>
                         <td>${link.title}</td>
@@ -5154,7 +5149,7 @@ if (action === 'edit') {
 
         // Salvar Dados do Corretor
         document.getElementById('save-broker-info').addEventListener('click', () => {
-            db.settings.brokerName = document.getElementById('setting-broker-name').value;
+           // db.settings.brokerName = document.getElementById('setting-broker-name').value;
             db.settings.brokerCreci = document.getElementById('setting-broker-creci').value;
             db.settings.brokerPhone = document.getElementById('setting-broker-phone').value;
             
